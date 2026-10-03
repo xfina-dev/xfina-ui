@@ -45,7 +45,11 @@ jobs:
 
       - run: npm ci
 
-      # dist/ is what sites copy, so it has to be exactly what src/ builds.
-      - run: npm run check
+      # The package as sites install it: components, style.css, preset, plugin.
+      - run: npm run build
 
       - run: npm test
+
+      # The gallery builds against the source, so a component that only
+      # breaks inside a real Vite and Tailwind build fails here.
+      - run: npm run demo:build

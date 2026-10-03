@@ -1,7 +1,8 @@
+// @vitest-environment node
 // Light and dark: the OS decides until the reader chooses, and the choice
 // follows them across every xfina.dev site.
 
-import { test } from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
 import { page } from "./helpers.js";
 
