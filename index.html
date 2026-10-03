@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>xfina-ui</title>
+  <link rel="icon" type="image/svg+xml" href="dist/logo.svg">
+  <link rel="stylesheet" href="dist/xfina-ui.css">
+  <script src="dist/xfina-theme.js"></script>
+  <script defer src="dist/xfina-ui.js"></script>
+  <style>
+    /* This page only: a gallery of what dist/ provides, served by
+       `npm run demo`. It is not shipped to any site. */
+    h2 { font-size: 1.25rem; margin: 48px 0 4px; }
+    .note { color: hsl(var(--muted-foreground)); margin: 0 0 16px; }
+    .frame { border: 1px dashed hsl(var(--border)); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .swatch { display: flex; align-items: center; gap: 8px; font: 0.75rem/1.2 var(--font-mono); }
+    .swatch i { flex: none; width: 28px; height: 28px; border-radius: 6px; border: 1px solid hsl(var(--border)); }
+    .ramp { display: flex; gap: 2px; margin-bottom: 8px; }
+    .ramp i { flex: 1; height: 28px; }
+    .ramp i:first-child { border-radius: 4px 0 0 4px; }
+    .ramp i:last-child { border-radius: 0 4px 4px 0; }
+    xfina-footer { margin-top: 48px; }
+  </style>
+</head>
+<body>
+  <main class="xf-container">
+    <xfina-header site="data" home="./"></xfina-header>
+
+    <h2>Header on each site</h2>
+    <p class="note">The same element with a different <code>site</code>. Labs shows a site-owned picker in the <code>context</code> slot, drawn with <code>&lt;xfina-select&gt;</code>.</p>
+    <div class="frame"><xfina-header site="xfina" home="./"></xfina-header></div>
+    <div class="frame">
+      <xfina-header site="labs" home="./">
+        <xfina-select slot="context" label="App">
+          <option value="all">All apps</option>
+          <option value="portfolio" selected>Portfolio Engine</option>
+        </xfina-select>
+        <span slot="tagline">Multi-asset portfolio backtester with bring-your-own data.<br>Everything runs in your browser; nothing is uploaded to any server.</span>
+      </xfina-header>
+    </div>
+
+    <h2>Interface colours</h2>
+    <p class="note">shadcn zinc, as xfina.dev and labs.xfina.dev already draw it. Toggle the theme to see the dark set.</p>
+    <div class="swatches" id="ui"></div>
+
+    <h2>Chart series</h2>
+    <p class="note">Assigned in this order, never picked out of it. The order keeps neighbouring series apart for colour-blind readers.</p>
+    <div class="swatches" id="chart"></div>
+
+    <h2>Ramps and status</h2>
+    <p class="note">Sequential (magnitude), diverging (fall · none · rise), and status, which is never a series colour.</p>
+    <div class="ramp" id="seq"></div>
+    <div class="ramp" id="div"></div>
+    <div class="swatches" id="status"></div>
+
+    <xfina-footer site="data"></xfina-footer>
+  </main>
+  <script>
+    const swatch = (name) =>
+      `<div class="swatch"><i style="background:hsl(var(--${name}))"></i>${name}</div>`;
+    const ui = ["background", "foreground", "primary", "secondary", "muted", "muted-foreground", "accent", "border", "ring", "destructive"];
+    document.getElementById("ui").innerHTML = ui.map(swatch).join("");
+    document.getElementById("chart").innerHTML = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => swatch(`chart-${i}`)).join("");
+    for (const ramp of ["seq", "div"]) {
+      document.getElementById(ramp).innerHTML = [1, 2, 3, 4, 5].map((i) => `<i style="background:hsl(var(--${ramp}-${i}))" title="${ramp}-${i}"></i>`).join("");
+    }
+    document.getElementById("status").innerHTML = ["good", "warning", "serious", "critical"].map((s) => swatch(`status-${s}`)).join("");
+  </script>
+</body>
+</html>
