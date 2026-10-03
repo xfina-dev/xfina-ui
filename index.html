@@ -26,7 +26,19 @@
 </head>
 <body>
   <main class="xf-container">
-    <xfina-header site="data" home="./"></xfina-header>
+    <xfina-header site="data" home="./">
+      <xfina-select slot="context" label="Dataset" value="all">
+        <option value="all">All datasets</option>
+        <optgroup label="USD/INR Rates">
+          <option value="sbi-forex-card-usd">SBI forex card</option>
+          <option value="bis-usd-inr">BIS USD/INR</option>
+        </optgroup>
+        <optgroup label="Inflation">
+          <option value="in-cpi">MoSPI CPI</option>
+          <option value="in-cpi-imf">IMF CPI</option>
+        </optgroup>
+      </xfina-select>
+    </xfina-header>
 
     <h2>Header on each site</h2>
     <p class="note">The same element with a different <code>site</code>. Labs shows a site-owned picker in the <code>context</code> slot, drawn with <code>&lt;xfina-select&gt;</code>.</p>

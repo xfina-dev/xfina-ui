@@ -110,3 +110,39 @@ test("a select with no options fails loudly", () => {
   const empty = p.window.document.createElement("xfina-select");
   assert.throws(() => empty.connectedCallback(), /needs at least one <option>/);
 });
+
+test("option groups are labelled, divided, and move as one list", () => {
+  const { element, root, trigger, press, changes } = mount(`
+    <xfina-select label="Dataset" value="/">
+      <option value="/">All datasets</option>
+      <optgroup label="USD/INR Rates">
+        <option value="/datasets/sbi/">SBI forex card</option>
+        <option value="/datasets/bis/">BIS USD/INR</option>
+      </optgroup>
+      <optgroup label="Inflation">
+        <option value="/datasets/cpi/">MoSPI CPI</option>
+      </optgroup>
+    </xfina-select>`);
+  const groups = [...root.querySelectorAll('[role="group"]')].map((g) => [
+    g.querySelector(".group-label").textContent,
+    [...g.querySelectorAll('[role="option"]')].map((o) => o.textContent),
+  ]);
+  assert.deepEqual(groups, [
+    ["USD/INR Rates", ["SBI forex card", "BIS USD/INR"]],
+    ["Inflation", ["MoSPI CPI"]],
+  ]);
+  for (const group of root.querySelectorAll('[role="group"]')) {
+    assert.equal(root.getElementById(group.getAttribute("aria-labelledby")).textContent, group.firstChild.textContent);
+  }
+  assert.equal(root.querySelectorAll(".separator").length, 2, "between All datasets and each group");
+
+  press("ArrowDown");
+  press("ArrowDown");
+  press("ArrowDown");
+  press("ArrowDown");
+  press("Enter");
+  assert.equal(element.value, "/datasets/cpi/", "the arrows cross from one group into the next");
+  assert.deepEqual(changes, ["/datasets/cpi/"]);
+  assert.equal(root.querySelector(".value").textContent, "MoSPI CPI");
+  assert.equal(trigger.getAttribute("aria-expanded"), "false");
+});
