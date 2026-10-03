@@ -1,0 +1,48 @@
+/* What every xfina.dev page shares beneath its own styles: the surface, the
+   type, the page column and the scrollbars. Nothing here styles a site's own
+   components. Those belong to the site. */
+
+/* Reserve the scrollbar's space on every page. Without it, a short page and a
+   long one differ in width by the scrollbar, and the header jumps sideways
+   when moving between them, or between sites. */
+html { scrollbar-gutter: stable; }
+
+body {
+  margin: 0;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The page column: 72rem of content with the padding outside it, as Tailwind's
+   `max-w-6xl p-8` draws it on xfina.dev. A phone keeps a 16px gutter rather
+   than spending 64px of a 375px screen on padding. */
+.xf-container {
+  box-sizing: content-box;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 32px;
+}
+@media (max-width: 640px) {
+  .xf-container { padding: 24px 16px; }
+}
+
+/* Scrollbars follow the theme. Left alone, the browser paints a light-mode bar
+   over a dark surface. The thumb is drawn from --muted-foreground, because
+   --border is nearly the background in dark mode and would vanish. Set on `*`
+   so a scrolling area added later cannot miss it. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.35);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: hsl(var(--muted-foreground) / 0.55); }
