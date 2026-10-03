@@ -33,6 +33,7 @@ Other products, such as xsteer.in and sakthipriyan.com, use Xfina, Xfingine and 
 - **Comments explain why.** Name the failure mode being avoided. What the code does is already on the next line.
 - **Single-commit pull requests,** amended and force-pushed. `main` changes only through a pull request, and the required check is `Web`.
 - **CHANGELOG.md** gets an entry for every change to `src/`.
+- **Releasing:** bump `version` in `package.json` in a PR, merge it, then tag `vX.Y.Z` on `main`. The Publish workflow stages it on npm; a maintainer approves it with 2FA, and only then can sites install it. Never give the trusted publisher direct-publish permission.
 
 ## Build
 

@@ -132,4 +132,4 @@ npm test         # components, preset, theme and tokens
 npm run build    # dist/: the components, style.css, the preset and the Vite plugin
 ```
 
-Releases are tagged `vX.Y.Z` on `main`; the Publish workflow puts that version on npm with provenance.
+Releases are tagged `vX.Y.Z` on `main`. The Publish workflow builds and tests that commit, then stages the version on npm through trusted publishing. It goes live only when a maintainer approves it on npmjs.com with 2FA.
