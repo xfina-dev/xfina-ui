@@ -7,11 +7,14 @@
    when moving between them, or between sites. */
 html { scrollbar-gutter: stable; }
 
+/* line-height 1.5 is what Tailwind's preflight gives xfina.dev and Labs;
+   without it a site with no Tailwind, such as Data, sets text tighter. */
 body {
   margin: 0;
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 

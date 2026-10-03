@@ -1,4 +1,4 @@
-/* xfina-ui 0.1.0 */
+/* xfina-ui 0.2.0 */
 // Light or dark, once for every xfina.dev site: the OS decides until the reader
 // presses a toggle, and then their choice holds on xfina.dev, data.xfina.dev
 // and labs.xfina.dev alike.

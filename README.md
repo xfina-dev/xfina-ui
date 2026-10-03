@@ -72,7 +72,7 @@ The picker beside the title, drawn the way Labs and xfina.dev draw theirs with s
 
 | | |
 |---|---|
-| `<option>` children | The choices, read once. `selected` (or the element's `value` attribute) sets the initial choice. |
+| `<option>` / `<optgroup>` children | The choices, read once. An `<optgroup label>` is drawn as a labelled group, with separators between sections. `selected` (or the element's `value` attribute) sets the initial choice. |
 | `label` | The accessible name, such as "App" or "Dataset". |
 | `value` | The chosen option's value. Setting it to a value no option has throws an error. |
 | `change` event | Fired when the reader picks a different option, with `detail.value`. What the choice does is up to the site. |

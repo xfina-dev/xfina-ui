@@ -1,4 +1,4 @@
-/* xfina-ui 0.1.0 */
+/* xfina-ui 0.2.0 */
 // The parts every xfina.dev site draws the same way: <xfina-header>,
 // <xfina-footer> and <xfina-select>. Plain custom elements with no framework,
 // so the same file serves data.xfina.dev (static HTML) and the Vue sites
@@ -15,7 +15,7 @@
 (() => {
   if (window.XfinaUI) return;
 
-  const VERSION = "0.1.0";
+  const VERSION = "0.2.0";
   const LOGO = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"103 101 310 310\"><defs><linearGradient id=\"xGrad\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#243B92\"/><stop offset=\"100%\" stop-color=\"#4457D9\"/></linearGradient><linearGradient id=\"accent\" x1=\"0%\" y1=\"100%\" x2=\"0%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#3EDFD8\"/><stop offset=\"100%\" stop-color=\"#5BE5FF\"/></linearGradient></defs><!-- X --><path fill=\"url(#xGrad)\" d=\" M118 120 L190 120 L256 210 L322 120 L394 120 L292 255 L396 392 L326 392 L256 298 L186 392 L116 392 L220 255 Z\"/><!-- Data Bars --><rect x=\"318\" y=\"228\" width=\"22\" height=\"56\" rx=\"5\" fill=\"url(#accent)\"/><rect x=\"348\" y=\"198\" width=\"22\" height=\"86\" rx=\"5\" fill=\"url(#accent)\"/><rect x=\"378\" y=\"164\" width=\"22\" height=\"120\" rx=\"5\" fill=\"url(#accent)\"/></svg>";
 
   // The family, in the order the switcher and footer show it. Xfina, the
@@ -305,7 +305,9 @@
   //     <option value="portfolio" selected>Portfolio Engine</option>
   //   </xfina-select>
   //
-  // The <option> children are read once, as data. Choosing one sets `value`
+  // The <option> and <optgroup> children are read once, as data. A group is
+  // drawn as shadcn's SelectGroup with a SelectLabel, and sections are divided
+  // by a SelectSeparator. Choosing one sets `value`
   // and fires `change` on the element; what a choice does (navigate, filter)
   // is the site's business. Keyboard use follows the ARIA combobox pattern:
   // focus stays on the trigger, and the arrow keys move the highlight.
@@ -326,7 +328,9 @@
     .value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .trigger svg { flex: none; width: 16px; height: 16px; opacity: 0.5; }
     [role="listbox"] {
-      position: absolute; z-index: 50; top: calc(100% + 4px); left: 0; min-width: 100%;
+      /* As wide as its widest line, and never narrower than the trigger. An
+         absolute box would otherwise shrink to the trigger and wrap labels. */
+      position: absolute; z-index: 50; top: calc(100% + 4px); left: 0; min-width: 100%; width: max-content;
       box-sizing: border-box; max-height: 384px; overflow-y: auto; margin: 0; padding: 4px;
       border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) - 2px);
       background: hsl(var(--popover)); color: hsl(var(--popover-foreground));
@@ -342,6 +346,8 @@
     [role="option"].active { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
     [role="option"] svg { position: absolute; left: 8px; width: 16px; height: 16px; visibility: hidden; }
     [role="option"][aria-selected="true"] svg { visibility: visible; }
+    .group-label { white-space: nowrap; padding: 6px 8px 6px 32px; font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
+    .separator { height: 1px; margin: 4px -4px; background: hsl(var(--muted)); }
   `;
 
   let selects = 0;
@@ -349,11 +355,24 @@
   class XfinaSelect extends HTMLElement {
     connectedCallback() {
       if (this.shadowRoot) return;
-      this.choices = [...this.querySelectorAll("option")].map((o) => ({
-        value: o.value,
-        label: o.textContent.trim(),
-        selected: o.hasAttribute("selected"),
-      }));
+      // Sections in document order: each <optgroup>, and each run of options
+      // outside one. Choices are numbered across all of them, so the keyboard
+      // moves through the whole list as one.
+      const sections = [];
+      this.choices = [];
+      const read = (option) => {
+        this.choices.push({ value: option.value, label: option.textContent.trim(), selected: option.hasAttribute("selected") });
+        return this.choices.length - 1;
+      };
+      for (const child of this.children) {
+        if (child.localName === "optgroup") {
+          sections.push({ label: child.label, items: [...child.querySelectorAll("option")].map(read) });
+        } else if (child.localName === "option") {
+          const last = sections.at(-1);
+          if (last && last.label == null) last.items.push(read(child));
+          else sections.push({ label: null, items: [read(child)] });
+        }
+      }
       if (!this.choices.length) throw new Error("<xfina-select>: needs at least one <option>");
 
       const id = `xfina-select-${++selects}`;
@@ -367,13 +386,22 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div role="listbox" id="${id}" aria-label="${label}" hidden>
-          ${this.choices
-            .map(
-              (c, i) =>
-                `<div role="option" id="${id}-${i}" data-index="${i}" aria-selected="false">` +
-                `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>${escape(c.label)}</div>`,
-            )
-            .join("")}
+          ${sections
+            .map((section, k) => {
+              const options = section.items
+                .map(
+                  (i) =>
+                    `<div role="option" id="${id}-${i}" data-index="${i}" aria-selected="false">` +
+                    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>${escape(this.choices[i].label)}</div>`,
+                )
+                .join("");
+              if (section.label == null) return options;
+              return (
+                `<div role="group" aria-labelledby="${id}-g${k}">` +
+                `<div class="group-label" id="${id}-g${k}">${escape(section.label)}</div>${options}</div>`
+              );
+            })
+            .join('<div class="separator" role="separator"></div>')}
         </div>
       `;
       this.trigger = root.querySelector(".trigger");

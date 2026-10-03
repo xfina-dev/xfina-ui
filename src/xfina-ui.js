@@ -304,7 +304,9 @@
   //     <option value="portfolio" selected>Portfolio Engine</option>
   //   </xfina-select>
   //
-  // The <option> children are read once, as data. Choosing one sets `value`
+  // The <option> and <optgroup> children are read once, as data. A group is
+  // drawn as shadcn's SelectGroup with a SelectLabel, and sections are divided
+  // by a SelectSeparator. Choosing one sets `value`
   // and fires `change` on the element; what a choice does (navigate, filter)
   // is the site's business. Keyboard use follows the ARIA combobox pattern:
   // focus stays on the trigger, and the arrow keys move the highlight.
@@ -325,7 +327,9 @@
     .value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .trigger svg { flex: none; width: 16px; height: 16px; opacity: 0.5; }
     [role="listbox"] {
-      position: absolute; z-index: 50; top: calc(100% + 4px); left: 0; min-width: 100%;
+      /* As wide as its widest line, and never narrower than the trigger. An
+         absolute box would otherwise shrink to the trigger and wrap labels. */
+      position: absolute; z-index: 50; top: calc(100% + 4px); left: 0; min-width: 100%; width: max-content;
       box-sizing: border-box; max-height: 384px; overflow-y: auto; margin: 0; padding: 4px;
       border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) - 2px);
       background: hsl(var(--popover)); color: hsl(var(--popover-foreground));
@@ -341,6 +345,8 @@
     [role="option"].active { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); }
     [role="option"] svg { position: absolute; left: 8px; width: 16px; height: 16px; visibility: hidden; }
     [role="option"][aria-selected="true"] svg { visibility: visible; }
+    .group-label { white-space: nowrap; padding: 6px 8px 6px 32px; font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
+    .separator { height: 1px; margin: 4px -4px; background: hsl(var(--muted)); }
   `;
 
   let selects = 0;
@@ -348,11 +354,24 @@
   class XfinaSelect extends HTMLElement {
     connectedCallback() {
       if (this.shadowRoot) return;
-      this.choices = [...this.querySelectorAll("option")].map((o) => ({
-        value: o.value,
-        label: o.textContent.trim(),
-        selected: o.hasAttribute("selected"),
-      }));
+      // Sections in document order: each <optgroup>, and each run of options
+      // outside one. Choices are numbered across all of them, so the keyboard
+      // moves through the whole list as one.
+      const sections = [];
+      this.choices = [];
+      const read = (option) => {
+        this.choices.push({ value: option.value, label: option.textContent.trim(), selected: option.hasAttribute("selected") });
+        return this.choices.length - 1;
+      };
+      for (const child of this.children) {
+        if (child.localName === "optgroup") {
+          sections.push({ label: child.label, items: [...child.querySelectorAll("option")].map(read) });
+        } else if (child.localName === "option") {
+          const last = sections.at(-1);
+          if (last && last.label == null) last.items.push(read(child));
+          else sections.push({ label: null, items: [read(child)] });
+        }
+      }
       if (!this.choices.length) throw new Error("<xfina-select>: needs at least one <option>");
 
       const id = `xfina-select-${++selects}`;
@@ -366,13 +385,22 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <div role="listbox" id="${id}" aria-label="${label}" hidden>
-          ${this.choices
-            .map(
-              (c, i) =>
-                `<div role="option" id="${id}-${i}" data-index="${i}" aria-selected="false">` +
-                `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>${escape(c.label)}</div>`,
-            )
-            .join("")}
+          ${sections
+            .map((section, k) => {
+              const options = section.items
+                .map(
+                  (i) =>
+                    `<div role="option" id="${id}-${i}" data-index="${i}" aria-selected="false">` +
+                    `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>${escape(this.choices[i].label)}</div>`,
+                )
+                .join("");
+              if (section.label == null) return options;
+              return (
+                `<div role="group" aria-labelledby="${id}-g${k}">` +
+                `<div class="group-label" id="${id}-g${k}">${escape(section.label)}</div>${options}</div>`
+              );
+            })
+            .join('<div class="separator" role="separator"></div>')}
         </div>
       `;
       this.trigger = root.querySelector(".trigger");
