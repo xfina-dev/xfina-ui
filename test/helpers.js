@@ -1,9 +1,10 @@
-// A page in jsdom with xfina-ui's built files loaded the way a site loads them.
+// A page in jsdom with the theme script run the way xfina-ui/vite runs it:
+// inline, at the top of <head>.
 
 import { readFileSync } from "node:fs";
 import { JSDOM, CookieJar } from "jsdom";
 
-const dist = (name) => readFileSync(new URL(`../dist/${name}`, import.meta.url), "utf8");
+const themeScript = readFileSync(new URL("../src/theme-script.js", import.meta.url), "utf8");
 
 export function page({ url = "https://data.xfina.dev/", body = "", osDark = false, cookieJar = new CookieJar() } = {}) {
   const dom = new JSDOM(`<!doctype html><html><head></head><body>${body}</body></html>`, {
@@ -28,8 +29,7 @@ export function page({ url = "https://data.xfina.dev/", body = "", osDark = fals
   return {
     window,
     cookieJar,
-    theme: () => window.eval(dist("xfina-theme.js")),
-    ui: () => window.eval(dist("xfina-ui.js")),
+    theme: () => window.eval(themeScript),
     setOsDark(dark) {
       media.matches = dark;
       for (const listener of listeners) listener();

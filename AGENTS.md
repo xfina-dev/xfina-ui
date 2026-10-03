@@ -1,46 +1,45 @@
 # xfina-ui — Agent Context & Guidelines
 
-xfina-ui is the shared look of the xfina.dev sites. It exists so that three repositories, built three different ways, still read as one product.
+xfina-ui is the theme and the UI components of the xfina.dev sites, published to npm as `xfina-ui`. Every site is Vue + Tailwind + Vite, and every site takes its look from this package, so three repositories read as one product.
 
 - **Xfina** is the flagship: the statement parser, published as a library and with its own versioned UI at xfina.dev.
 - **Xfina Labs**: unversioned apps at labs.xfina.dev, built on Xfina and Xfingine. The first is the Portfolio Engine.
 - **Xfingine** is the core engine. It has no site, only its GitHub repository and its pages on crates.io, npm and PyPI. The switcher links to its repository, and it is never a `site` value.
 - **Xfina Data**: open datasets at data.xfina.dev.
 
-Other products, such as xsteer.in and sakthipriyan.com, use Xfina, Xfingine and the datasets with their own UI. xfina-ui is for the xfina.dev sites only, and no library may depend on it.
+Other products, such as xsteer.in and sakthipriyan.com, use Xfina, Xfingine and the datasets with their own UI. This package is for the xfina.dev sites only, and no library may depend on it.
 
 ## What belongs here
 
-Only what must be identical on every xfina.dev site:
+**Every UI component.** A site holds only how its pages are composed (its Vue templates and page layout) and its own logic: what it fetches, computes and plots. A site defines no colour and no component of its own.
 
-1. **Tokens.** Every colour, the radius and the font stacks, in `src/tokens.js`. A site never defines a colour of its own: if it needs one, the colour is added here, for every site.
-2. **Light and dark.** `src/xfina-theme.js` is the only code that decides the theme.
-3. **The frame.** The header, the footer, the page column and the logo.
-
-A site's own components stay in that site's repository: tables, charts, dialogs, buttons inside its pages. Moving a component here means every site must render it the same way, so do it only when that is true.
+1. **Tokens.** Every colour, the radius and the font stacks, in `src/tokens.js`, written to `style.css` and mapped into Tailwind by the preset.
+2. **Light and dark.** `src/theme-script.js` is the only code that decides the theme. The Vite plugin puts it in every page's `<head>`; `useXfinaTheme()` reads and toggles it.
+3. **shadcn-vue components,** owned once in `src/components/ui/`. xfina and Labs delete their copies of `components/ui/` when they adopt this package. A site that needs a component this package lacks adds it here, for every site, and never builds it locally.
+4. **The frame.** `XfinaHeader`, `XfinaFamily`, the page column and the logo.
+5. **Chart styling,** in `src/chart.js`. A site's chart code decides what is plotted, never how it looks.
 
 ## Rules
 
-4. **No framework, no runtime dependencies.** One site is static HTML built by a Rust tool and two are Vue apps. Plain custom elements and CSS work in all three, and keep working when any of them changes stack.
-5. **Shadow DOM for the elements.** Tailwind's preflight and each site's CSS would otherwise restyle the header differently on every site, which is the drift this repo exists to stop. Colours still come from the page's tokens, because custom properties reach into a shadow root.
-6. **Sites vendor a tagged release; nothing is loaded across origins.** A site copies `dist/` at a tag and checks it against `SHA256SUMS`. A change here reaches a site only when that site upgrades, in its own pull request, so no release can silently change a live site.
-7. **`dist/` is built, never edited.** `npm run build` writes it from `src/`, and CI fails a pull request whose `dist/` differs from what `src/` builds.
-8. **A palette change is validated before it merges.** Chart colours are checked for colour-blind separation and contrast against both surfaces (`#ffffff` and `#09090b`). Record the result in the comment above `chart` in `src/tokens.js`. The slot order is part of what is validated: never reorder the slots, or assign them out of order, without re-running the check.
-9. **Errors, never silent fallbacks.** An unknown `site` throws. A missing theme script is reported in the console and its toggle hidden. Neither draws a header that looks right but is wrong.
-10. **Versioning.** A change any site would see on upgrade (a token value, the header layout) is a minor version while below 1.0. Renaming or removing a token, slot, attribute or event is breaking, because sites depend on those names.
+6. **The components stay shadcn's.** They are shadcn-vue's source, on reka-ui, changed only where the family needs it. Keep them close to upstream so a later shadcn fix can be compared and taken in.
+7. **Sites pin a published version.** A site depends on `xfina-ui` from npm at a version it chose, never a path or a git branch, so a change here reaches a site only when that site upgrades, in its own pull request. This is the same rule xfina-data follows for Xfina.
+8. **Classes need the site's content path.** Tailwind lets a site's `content` replace a preset's, so each site lists `./node_modules/xfina-ui/dist/**/*.js` itself. Without it the components render unstyled. The README's setup shows it, and every port is checked in a browser.
+9. **A palette change is validated before it merges.** Chart colours are checked for colour-blind separation and contrast against both surfaces (`#ffffff` and `#09090b`). Record the result in the comment above `chart` in `src/tokens.js`. The slot order is part of what is validated: never reorder the slots, or assign them out of order, without re-running the check. Status text tokens are held to 4.5:1 by a test.
+10. **Errors, never silent fallbacks.** An unknown `site` throws. A missing theme script throws when a component needs it. A chart helper throws on a token that is not defined. None of them draws something that looks right but is wrong.
+11. **Versioning.** A change any site would see on upgrade (a token value, a component's look) is a minor version while below 1.0. Renaming or removing a token, component, prop, slot or event is breaking, because sites depend on those names.
 
 ## Conventions
 
 - **Comments explain why.** Name the failure mode being avoided. What the code does is already on the next line.
-- **Single-commit pull requests,** amended and force-pushed. `main` changes only through a pull request.
+- **Single-commit pull requests,** amended and force-pushed. `main` changes only through a pull request, and the required check is `Web`.
 - **CHANGELOG.md** gets an entry for every change to `src/`.
 
 ## Build
 
 ```bash
 npm ci
-npm run check
+npm run build
 npm test
 ```
 
-Both are CI gates.
+All three run in CI. `npm run demo` serves the gallery at http://localhost:4310.

@@ -1,0 +1,51 @@
+name: Publish
+
+# Puts a tagged version on npm. Sites pin the version they use, so a release
+# reaches a site only when that site upgrades.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  # npm trusted publishing: npm checks this workflow's identity instead of a
+  # stored token, and records provenance linking the package to this commit.
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # A tag on a branch that never merged would publish unreviewed code.
+      - name: Check the tag is on main
+        run: |
+          git fetch -q origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Check the tag matches package.json
+        run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          [ "v$VERSION" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME, package.json $VERSION"; exit 1; }
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+      - name: Publish
+        run: |
+          npm install -g npm@latest
+          unset NODE_AUTH_TOKEN
+          npm publish --access public --provenance

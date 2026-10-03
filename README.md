@@ -1,6 +1,6 @@
 # xfina-ui
 
-The shared look of the xfina.dev sites. This repo provides the colours, light and dark mode, and the header and footer, so the three sites read as one product.
+The theme and UI components of the xfina.dev sites, as one npm package: a Tailwind preset, light and dark mode shared across the sites, the shared header, and the shadcn-vue components every site uses. Each site imports what it needs and keeps no components of its own, so the three sites read as one product.
 
 | | What it is | Where |
 |---|---|---|
@@ -11,93 +11,125 @@ The shared look of the xfina.dev sites. This repo provides the colours, light an
 
 Other products, such as xsteer.in and sakthipriyan.com, use these libraries and datasets with their own UI. They do not use xfina-ui.
 
-It holds only what must be identical on every site. A site's own components, such as tables, charts and dialogs, stay in that site's repository.
+## Setup on a site
+
+Every site is Vue 3, Tailwind 3 and Vite.
+
+```bash
+npm install xfina-ui
+```
+
+```js
+// vite.config.js: the plugin puts the theme script first in <head>, so
+// light or dark is set before the first paint.
+import vue from "@vitejs/plugin-vue";
+import xfina from "xfina-ui/vite";
+export default { plugins: [vue(), xfina()] };
+```
+
+```js
+// tailwind.config.js: the preset brings every colour, the radius and dark
+// mode. The last content path is required: Tailwind lets a site's `content`
+// replace a preset's, and without it the components render unstyled.
+import xfina from "xfina-ui/tailwind";
+export default {
+  presets: [xfina],
+  content: ["./index.html", "./src/**/*.{vue,js}", "./node_modules/xfina-ui/dist/**/*.js"],
+};
+```
+
+```js
+// main.js
+import "xfina-ui/style.css"; // the tokens, light and dark
+import "./style.css";        // @tailwind base; @tailwind components; @tailwind utilities;
+```
+
+```vue
+<!-- App.vue: once, around everything -->
+<XfinaProvider>…</XfinaProvider>
+```
+
+`XfinaProvider` keeps the page still when a Select or Dialog opens: reka-ui would otherwise pad the page by the scrollbar's width on top of the space `style.css` already reserves for it, shifting everything left. It also provides the timing every `Tooltip` needs.
+
+A site defines no colours: delete any `:root` / `.dark` token blocks and any copy of shadcn's `components/ui/`.
 
 ## What it provides
 
-| File | What it is | How a page loads it |
-|---|---|---|
-| `dist/xfina-ui.css` | Colour tokens for light and dark, the page column (`.xf-container`), the body and the scrollbars | `<link rel="stylesheet">`, or `import` in a Vite app |
-| `dist/xfina-theme.js` | Light/dark: follows the OS until the reader chooses, then remembers the choice across all xfina.dev sites | A classic `<script>` in `<head>`, with no `defer` |
-| `dist/xfina-ui.js` | The `<xfina-header>` and `<xfina-footer>` elements | `<script defer>`, or a side-effect `import` |
-| `dist/logo.svg` | The logo, for use as a favicon | `<link rel="icon">` |
-| `dist/SHA256SUMS` | A hash of each file above | Used to verify a vendored copy |
+```vue
+<script setup>
+import { XfinaProvider, XfinaHeader, Button, Card, CardHeader, CardTitle, CardContent } from "xfina-ui";
+</script>
 
-No framework and no runtime dependencies. Both elements render into a shadow root, so neither Tailwind's preflight nor a site's own CSS can restyle them.
-
-## Using it on a site
-
-Copy `dist/` from a release tag into the site, for example to `vendor/xfina-ui/`, and check the copy against `SHA256SUMS`. Sites never load these files from another origin at runtime: a site's look changes only when that site upgrades, in its own pull request.
-
-```html
-<head>
-  <link rel="icon" type="image/svg+xml" href="/vendor/xfina-ui/logo.svg">
-  <link rel="stylesheet" href="/vendor/xfina-ui/xfina-ui.css">
-  <script src="/vendor/xfina-ui/xfina-theme.js"></script>
-  <script defer src="/vendor/xfina-ui/xfina-ui.js"></script>
-</head>
-<body>
-  <main class="xf-container">
-    <xfina-header site="data"></xfina-header>
-    …
-    <xfina-footer site="data"></xfina-footer>
-  </main>
-</body>
+<template>
+  <XfinaProvider>
+    <main class="xf-container space-y-8">
+      <XfinaHeader site="data" heading />
+      <Card>
+        <CardHeader><CardTitle>USD/INR</CardTitle></CardHeader>
+        <CardContent><Button size="sm">Download CSV</Button></CardContent>
+      </Card>
+    </main>
+  </XfinaProvider>
+</template>
 ```
 
-### `<xfina-header site="xfina | data | labs">`
+### Components
+
+shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, Input, Label, Select, Table, Tooltip**, with the same parts and props as shadcn. Also:
 
 | | |
 |---|---|
-| `site` | Required: `xfina`, `labs` or `data`. Sets the title, the tagline and the GitHub link, and leaves the site out of the switcher. Any other value throws an error, including `xfingine`, which has no site. |
-| `home` | Where the logo and title link to. Defaults to `/`. |
-| `heading` | Renders the title as `<h1>`. Use it on pages that have no other main heading. |
-| `slot="context"` | The site's own picker, shown beside the title: a version on xfina.dev, an app on Labs, a dataset on Data. Use `<xfina-select>` (below), or shadcn's `Select` at `h-9`, which looks the same. |
-| `slot="tagline"` | Replaces the site's default tagline. |
-| `slot="actions"` | Extra buttons, placed before the privacy and theme buttons. |
-| Switcher | `Xfina · Labs · Xfingine · Data`, without the current site, since the title already says where the reader is. The sites open in the same tab. Xfingine opens its GitHub repository in a new tab. |
-| Other buttons | Building Wealth (sakthipriyan.com/building-wealth, new tab), the site's GitHub repository, privacy, and the theme toggle. |
-| `xfina-privacy` event | Fired when the privacy button is pressed. A site that runs analytics calls `preventDefault()` and opens its own consent dialog. Otherwise a built-in dialog says that nothing is collected. |
+| `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
+| `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
+| `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
+| `cn()` | shadcn's class merger, for composing classes |
 
-### `<xfina-select label="…">`
-
-The picker beside the title, drawn the way Labs and xfina.dev draw theirs with shadcn's `Select`: a 36px trigger, and a menu with a check mark on the chosen item. It works without Vue, so data.xfina.dev gets the same control.
-
-```html
-<xfina-select slot="context" label="App">
-  <option value="all">All apps</option>
-  <option value="portfolio" selected>Portfolio Engine</option>
-</xfina-select>
-```
+### `XfinaHeader`
 
 | | |
 |---|---|
-| `<option>` / `<optgroup>` children | The choices, read once. An `<optgroup label>` is drawn as a labelled group, with separators between sections. `selected` (or the element's `value` attribute) sets the initial choice. |
-| `label` | The accessible name, such as "App" or "Dataset". |
-| `value` | The chosen option's value. Setting it to a value no option has throws an error. |
-| `change` event | Fired when the reader picks a different option, with `detail.value`. What the choice does is up to the site. |
+| `site` | Required: `xfina`, `labs` or `data`. Sets the title, tagline and GitHub link. Any other value throws, including `xfingine`, which has no site |
+| `home` | Where the logo and title link to. Defaults to `/` |
+| `heading` | Renders the title as `<h1>`, for a page with no other main heading |
+| `own-privacy` + `@privacy` | For a site that runs analytics: the privacy button emits `privacy` and the site opens its own consent dialog. Otherwise a built-in dialog says nothing is collected |
+| `#context` | The site's picker beside the title: version on Xfina, app on Labs, dataset on Data |
+| `#tagline`, `#actions` | Replace the tagline; add buttons before privacy and theme |
 
-The keyboard follows the ARIA combobox pattern. Arrow keys, Enter or Space open the menu. In the open menu, the arrows, Home and End move the highlight, Enter or Space chooses, and Escape or Tab closes it.
+The switcher lists the rest of the family (`Xfina · Labs · Xfingine · Data`, without the current site). Xfingine opens its GitHub repository in a new tab.
+
+### `XfinaFamily`
+
+One card per member of the family, as xsteer.in shows its projects; pass `site` to mark the current one. Below them, set apart and smaller, **Used by**: the products built on the family (Xsteer, The Personal Finance OS, on Xfina, Xfingine and Xfina Data; Building Wealth's RealValue Portfolio on Xfina Data), from `USED_BY`. They have their own brands, so they are not drawn as members.
+
+### Theme and charts
+
+| | |
+|---|---|
+| `useXfinaTheme()` | `{ isDark, toggle }`. The choice is a cookie on xfina.dev, so it holds on every subdomain |
+| `chart.series()` | The eight series colours as `rgb()`, in the order they are assigned |
+| `chart.ramp("seq" \| "div")` | Five steps for magnitude, or for change (fall, none, rise) |
+| `chart.echarts()` | `{ color, textStyle, legend, tooltip, axis }` to spread into an ECharts option |
+
+Read chart colours at draw time and again on the `themechange` window event.
 
 ### Tokens
 
-Every colour is an HSL triplet, as shadcn defines them, so any site uses it as `hsl(var(--name))`. Tailwind sites keep their existing `tailwind.config.js` colour mapping and remove their own `:root` and `.dark` blocks.
+Colours are HSL triplets, used through the preset (`bg-primary`, `text-muted-foreground`, `bg-chart-1`, `text-status-warning-text`, with opacity such as `bg-primary/10`) or directly as `hsl(var(--name))`.
 
-- **Interface:** shadcn zinc (`--background`, `--foreground`, `--primary`, `--muted`, `--border`, …).
-- **Charts:** `--chart-1` to `--chart-8`. Assign them in order. The order is what keeps neighbouring series apart for colour-blind readers.
-- **Ramps:** `--seq-1..5` for magnitude, and `--div-1..5` for change (fall, none, rise).
-- **Status:** `--status-good`, `--status-warning`, `--status-serious`, `--status-critical`. These mark a state, not a series, and always appear with an icon and a label.
+- **Interface:** shadcn zinc.
+- **Charts:** `chart-1` … `chart-8`. Assign them in order: the order keeps neighbouring series apart for colour-blind readers.
+- **Ramps:** `seq-1..5` for magnitude, `div-1..5` for change.
+- **Status:** `status-good`, `-warning`, `-serious`, `-critical`, each with a `-text` step for text. They mark a state, never a series.
 
-`themechange` is dispatched on `window`, with `detail.dark`, every time the theme changes, so a chart can redraw in the other palette.
+`.xf-container` is the page column: 72rem of content with 32px padding outside it, and a 16px gutter on a phone.
 
 ## Development
 
 ```bash
 npm install
-npm run build    # src/ → dist/
-npm test         # tokens, theme and elements, in jsdom
-npm run check    # fails if dist/ is not what src/ builds
-npm run demo     # gallery at http://localhost:4310
+npm run demo     # the gallery, from source, at http://localhost:4310
+npm test         # components, preset, theme and tokens
+npm run build    # dist/: the components, style.css, the preset and the Vite plugin
 ```
 
-`dist/` is committed, because sites copy it from a tag. CI fails a pull request whose `dist/` does not match its `src/`.
+Releases are tagged `vX.Y.Z` on `main`; the Publish workflow puts that version on npm with provenance.
