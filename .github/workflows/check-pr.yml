@@ -12,9 +12,11 @@ permissions:
   contents: read
 
 jobs:
-  # One job, so there is a single check to require.
-  ui:
-    name: UI
+  # One job, so there is a single check to require. Named Web, as the web
+  # checks of xfina, xfina-labs and xsteer are, so branch protection across
+  # the repositories names few distinct checks.
+  web:
+    name: Web
     # arm64 is free on public repositories and does the same work for less
     # power. The label pins an image version and has to be bumped when that
     # image is retired.
