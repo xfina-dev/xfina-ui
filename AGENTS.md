@@ -11,13 +11,16 @@ Other products, such as xsteer.in and sakthipriyan.com, use Xfina, Xfingine and 
 
 ## What belongs here
 
-Only what must be identical on every xfina.dev site:
+**Every UI component.** A site holds only how its pages are composed (HTML or Vue templates) and its own logic: what it fetches, computes and plots. A site defines no colour and no component of its own.
 
-1. **Tokens.** Every colour, the radius and the font stacks, in `src/tokens.js`. A site never defines a colour of its own: if it needs one, the colour is added here, for every site.
+1. **Tokens.** Every colour, the radius and the font stacks, in `src/tokens.js`.
 2. **Light and dark.** `src/xfina-theme.js` is the only code that decides the theme.
 3. **The frame.** The header, the footer, the page column and the logo.
+4. **Components that only need styling** are `xf-*` classes in `src/components.css`, copying shadcn's class for class: button, segmented control, card, input, label, badge, table, pre, prose.
+5. **Interactive components** are custom elements in `src/xfina-ui.js`: `<xfina-select>` today, with dialog, tooltip and accordion to follow.
+6. **Chart styling** is `XfinaUI.chart`: series colours, ramps, and the ECharts text, axis, legend and tooltip styles. A site's chart code decides what is plotted, never how it looks.
 
-A site's own components stay in that site's repository: tables, charts, dialogs, buttons inside its pages. Moving a component here means every site must render it the same way, so do it only when that is true.
+xfina and Labs replaced their copies of shadcn's `components/ui/` with these, deleting each copy as its replacement landed. A component exists in exactly one place: if a site needs something this repo does not have, it is added here, for every site, and not built in the site.
 
 ## Rules
 

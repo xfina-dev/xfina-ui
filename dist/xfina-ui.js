@@ -1,4 +1,4 @@
-/* xfina-ui 0.2.0 */
+/* xfina-ui 0.3.0 */
 // The parts every xfina.dev site draws the same way: <xfina-header>,
 // <xfina-footer> and <xfina-select>. Plain custom elements with no framework,
 // so the same file serves data.xfina.dev (static HTML) and the Vue sites
@@ -15,7 +15,7 @@
 (() => {
   if (window.XfinaUI) return;
 
-  const VERSION = "0.2.0";
+  const VERSION = "0.3.0";
   const LOGO = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"103 101 310 310\"><defs><linearGradient id=\"xGrad\" x1=\"0%\" y1=\"100%\" x2=\"100%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#243B92\"/><stop offset=\"100%\" stop-color=\"#4457D9\"/></linearGradient><linearGradient id=\"accent\" x1=\"0%\" y1=\"100%\" x2=\"0%\" y2=\"0%\"><stop offset=\"0%\" stop-color=\"#3EDFD8\"/><stop offset=\"100%\" stop-color=\"#5BE5FF\"/></linearGradient></defs><!-- X --><path fill=\"url(#xGrad)\" d=\" M118 120 L190 120 L256 210 L322 120 L394 120 L292 255 L396 392 L326 392 L256 298 L186 392 L116 392 L220 255 Z\"/><!-- Data Bars --><rect x=\"318\" y=\"228\" width=\"22\" height=\"56\" rx=\"5\" fill=\"url(#accent)\"/><rect x=\"348\" y=\"198\" width=\"22\" height=\"86\" rx=\"5\" fill=\"url(#accent)\"/><rect x=\"378\" y=\"164\" width=\"22\" height=\"120\" rx=\"5\" fill=\"url(#accent)\"/></svg>";
 
   // The family, in the order the switcher and footer show it. Xfina, the
@@ -507,6 +507,60 @@
   customElements.define("xfina-footer", XfinaFooter);
   customElements.define("xfina-select", XfinaSelect);
 
+  // Charts. Tokens are bare HSL triplets ("212.8 67.7% 50.2%") for CSS to
+  // wrap in hsl(); a chart library such as ECharts needs a colour it can
+  // parse, so the browser resolves each token to rgb() through a probe. Read
+  // them at draw time, and again on `themechange`: the values differ between
+  // light and dark.
+  let probe;
+  function colour(token) {
+    if (!probe) {
+      probe = document.createElement("span");
+      probe.hidden = true;
+      document.documentElement.append(probe);
+    }
+    probe.style.color = `hsl(var(${token}))`;
+    const resolved = getComputedStyle(probe).color;
+    if (!getComputedStyle(document.documentElement).getPropertyValue(token).trim()) {
+      throw new Error(`XfinaUI.chart: ${token} is not defined; is xfina-ui.css loaded?`);
+    }
+    return resolved;
+  }
+  const steps = (prefix, count) => Array.from({ length: count }, (_, i) => colour(`--${prefix}-${i + 1}`));
+
+  const chart = Object.freeze({
+    colour,
+    // Series colours, in the order they must be assigned.
+    series: () => steps("chart", 8),
+    // Five-step ramps: "seq" for magnitude, "div" for change (fall, none, rise).
+    ramp: (name) => steps(name, 5),
+    // ECharts option fragments in the shared style: spread them into a
+    // chart's options so every chart on every site has the same text, axes,
+    // legend and tooltip.
+    echarts() {
+      const ink = colour("--foreground");
+      const muted = colour("--muted-foreground");
+      const line = colour("--border");
+      return {
+        color: steps("chart", 8),
+        textStyle: { color: ink, fontFamily: "inherit" },
+        legend: { textStyle: { color: ink }, icon: "roundRect" },
+        tooltip: {
+          backgroundColor: colour("--popover"),
+          borderColor: line,
+          textStyle: { color: colour("--popover-foreground") },
+          axisPointer: { lineStyle: { color: muted } },
+        },
+        axis: {
+          axisLine: { lineStyle: { color: line } },
+          axisLabel: { color: muted },
+          nameTextStyle: { color: muted },
+          splitLine: { lineStyle: { color: line } },
+        },
+      };
+    },
+  });
+
   const frozen = (list) => Object.freeze(list.map((s) => Object.freeze({ ...s })));
-  window.XfinaUI = Object.freeze({ VERSION, FAMILY: frozen(FAMILY), SITES: frozen(SITES) });
+  window.XfinaUI = Object.freeze({ VERSION, FAMILY: frozen(FAMILY), SITES: frozen(SITES), chart });
 })();

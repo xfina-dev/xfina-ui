@@ -2,6 +2,14 @@
    type, the page column and the scrollbars. Nothing here styles a site's own
    components. Those belong to the site. */
 
+/* Sizes include the border and padding, as Tailwind's preflight sets it on
+   xfina.dev and Labs. Without it a site with no Tailwind (Data) would draw
+   every component a few pixels larger. */
+*, ::before, ::after { box-sizing: border-box; }
+
+/* Code in the mono stack, as preflight sets it; the size is left to context. */
+code, kbd, samp, pre { font-family: var(--font-mono); }
+
 /* Reserve the scrollbar's space on every page. Without it, a short page and a
    long one differ in width by the scrollbar, and the header jumps sideways
    when moving between them, or between sites. */

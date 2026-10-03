@@ -97,13 +97,34 @@ const status = {
   "status-critical": "#d03b3b",
 };
 
+// Status as text, such as a badge's label. The status colours themselves are
+// too light to read as small text on a light surface (warning is 1.7:1), so
+// text takes a step that reaches 4.5:1 on the badge's 12% tint of its status,
+// in each mode:
+//   light: good 6.6, warning 5.5, serious 5.2, critical 5.5
+//   dark:  good 5.3, warning 9.1, serious 6.6, critical 6.4
+const statusText = {
+  light: {
+    "status-good-text": "#006300",
+    "status-warning-text": "#8a5a00",
+    "status-serious-text": "#a8481a",
+    "status-critical-text": "#b42318",
+  },
+  dark: {
+    "status-good-text": "#0ca30c",
+    "status-warning-text": "#fab219",
+    "status-serious-text": "#ec835a",
+    "status-critical-text": "#f07070",
+  },
+};
+
 function mode(name) {
   const out = { ...ui[name] };
   chart[name].forEach((hex, i) => (out[`chart-${i + 1}`] = hex));
   for (const [ramp, steps] of Object.entries(ramps[name])) {
     steps.forEach((hex, i) => (out[`${ramp}-${i + 1}`] = hex));
   }
-  return { ...out, ...status };
+  return { ...out, ...status, ...statusText[name] };
 }
 
 export const colours = { light: mode("light"), dark: mode("dark") };

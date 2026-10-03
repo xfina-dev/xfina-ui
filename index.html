@@ -22,6 +22,8 @@
     .ramp i:first-child { border-radius: 4px 0 0 4px; }
     .ramp i:last-child { border-radius: 0 4px 4px 0; }
     xfina-footer { margin-top: 48px; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
   </style>
 </head>
 <body>
@@ -53,6 +55,67 @@
       </xfina-header>
     </div>
 
+    <h2>Components</h2>
+    <p class="note">The <code>xf-*</code> classes that replace shadcn's <code>components/ui</code>. The same class works in HTML and in a Vue template.</p>
+    <div class="frame xf-stack">
+      <div class="row">
+        <button class="xf-btn">Default</button>
+        <button class="xf-btn xf-btn-outline">Outline</button>
+        <button class="xf-btn xf-btn-secondary">Secondary</button>
+        <button class="xf-btn xf-btn-ghost">Ghost</button>
+        <button class="xf-btn xf-btn-destructive">Destructive</button>
+        <button class="xf-btn xf-btn-link">Link</button>
+        <button class="xf-btn" disabled>Disabled</button>
+      </div>
+      <div class="row">
+        <button class="xf-btn xf-btn-sm">Small</button>
+        <a class="xf-btn xf-btn-outline xf-btn-sm" href="#">Download CSV</a>
+        <button class="xf-btn xf-btn-lg">Large</button>
+        <button class="xf-btn xf-btn-outline xf-btn-icon" title="Icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span class="xf-sr-only">Add</span></button>
+        <div class="xf-segmented" role="group" aria-label="Period">
+          <button type="button">1Y</button><button type="button" aria-pressed="true">5Y</button><button type="button">10Y</button><button type="button">All</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="xf-badge">Recommended</span>
+        <span class="xf-badge xf-badge-good">Valid</span>
+        <span class="xf-badge xf-badge-warning">Design mock</span>
+        <span class="xf-badge xf-badge-critical">Invalid</span>
+        <span class="xf-badge xf-badge-soon">Not published yet</span>
+      </div>
+      <div class="cards">
+        <section class="xf-card">
+          <div class="xf-card-header">
+            <h3 class="xf-card-title">Card title</h3>
+            <p class="xf-card-description">Card description, in muted text.</p>
+          </div>
+          <div class="xf-card-content xf-prose">
+            <p>Running text in a card, with <a href="#">a link</a> and <code>code</code>.</p>
+            <pre class="xf-pre">curl --compressed -O https://data.xfina.dev/v1/fx/bis-usd-inr.csv</pre>
+          </div>
+          <div class="xf-card-footer"><button class="xf-btn xf-btn-sm">Preview</button></div>
+        </section>
+        <section class="xf-card">
+          <div class="xf-card-header"><h3 class="xf-card-title">Form</h3></div>
+          <div class="xf-card-content" style="display: grid; gap: 16px">
+            <div><label class="xf-label" for="demo-amount">Amount</label><input id="demo-amount" class="xf-input xf-input-sm" placeholder="10,000" style="margin-top: 6px"></div>
+            <div><label class="xf-label xf-muted" for="demo-from">From</label><input id="demo-from" type="date" class="xf-input xf-input-sm" style="margin-top: 6px"></div>
+          </div>
+        </section>
+      </div>
+      <table class="xf-table">
+        <thead><tr><th>Asset</th><th>Series</th><th>Ccy</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Nifty 50</td><td>Nifty 50 TRI</td><td>INR</td><td><span class="xf-badge xf-badge-good">Valid</span></td></tr>
+          <tr><td>Nasdaq 100</td><td>Irish UCITS ETF</td><td>USD</td><td><span class="xf-badge xf-badge-warning">Needs FX</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Chart theme</h2>
+    <p class="note"><code>XfinaUI.chart.echarts()</code> gives every chart the same text, axes, legend, tooltip and series colours. Toggle the theme: it redraws.</p>
+    <div class="frame"><div id="demo-chart" style="height: 280px"></div></div>
+
     <h2>Interface colours</h2>
     <p class="note">shadcn zinc, as xfina.dev and labs.xfina.dev already draw it. Toggle the theme to see the dark set.</p>
     <div class="swatches" id="ui"></div>
@@ -69,7 +132,34 @@
 
     <xfina-footer site="data"></xfina-footer>
   </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/6.1.0/echarts.min.js"
+    integrity="sha512-Uyq/AgtqFM4vT+unIGTDr4wMJDTUK9O5w2PXMQeBCSR8koqHpVz+qBmcQ+9Oeo5H+EmvT4pp/5QrsqhIbyjHTQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
+    addEventListener("DOMContentLoaded", () => {
+      const el = document.getElementById("demo-chart");
+      const plot = echarts.init(el);
+      const years = Array.from({ length: 11 }, (_, i) => 2016 + i);
+      function draw() {
+        const t = XfinaUI.chart.echarts();
+        plot.setOption({
+          animation: false,
+          color: t.color, textStyle: t.textStyle,
+          legend: { ...t.legend, top: 0, right: 0 },
+          tooltip: { ...t.tooltip, trigger: "axis" },
+          grid: { left: 8, right: 16, top: 40, bottom: 8, containLabel: true },
+          xAxis: { ...t.axis, type: "category", data: years, splitLine: { show: false } },
+          yAxis: { ...t.axis, type: "value" },
+          series: ["Portfolio", "Nifty 50", "Nasdaq 100"].map((name, k) => ({
+            name, type: "line", showSymbol: false, lineStyle: { width: 2 },
+            data: years.map((_, i) => Math.round(100 * Math.pow(1.08 + k * 0.03, i))),
+          })),
+        }, true);
+      }
+      draw();
+      addEventListener("themechange", draw);
+      addEventListener("resize", () => plot.resize());
+    });
     const swatch = (name) =>
       `<div class="swatch"><i style="background:hsl(var(--${name}))"></i>${name}</div>`;
     const ui = ["background", "foreground", "primary", "secondary", "muted", "muted-foreground", "accent", "border", "ring", "destructive"];

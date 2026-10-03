@@ -20,7 +20,7 @@ const declarations = (tokens, indent) =>
 
 function css() {
   const dark = declarations(colours.dark, "    ");
-  return `/* xfina-ui ${version}. Generated from src/tokens.js and src/base.css; do not edit. */
+  return `/* xfina-ui ${version}. Generated from src/tokens.js, src/base.css and src/components.css; do not edit. */
 
 :root {
   color-scheme: light;
@@ -43,7 +43,8 @@ ${dark}
 ${dark.replace(/^ {2}/gm, "")}
 }
 
-${read("src/base.css")}`;
+${read("src/base.css")}
+${read("src/components.css")}`;
 }
 
 // The logo is inlined into the header so no site has to serve it at a known

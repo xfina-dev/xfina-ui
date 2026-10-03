@@ -1,6 +1,6 @@
 {
   "name": "xfina-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "The shared look of the xfina.dev sites: colour tokens, light/dark theme, header and footer.",
   "license": "Apache-2.0",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- **Components:** `xf-*` classes copying shadcn's Button, Card, Input, Label and Table, plus Labs' segmented control and badge, with `xf-pre`, `xf-prose` and a few utilities. They replace the copies of shadcn's `components/ui/` in xfina and Labs; Data uses them in place of its own CSS.
+- **Charts:** `XfinaUI.chart` gives series colours, ramps, any token as `rgb()`, and ECharts option fragments (text, axes, legend, tooltip), so charts on every site look the same.
+- **Status text tokens:** `--status-*-text`, which reach 4.5:1 as small text on a status tint in both modes. Warning text was 1.7:1 on white.
+- **Base:** `box-sizing: border-box` everywhere, and code in the mono stack, as Tailwind's preflight sets them on xfina and Labs.
+
 ## 0.2.0
 
 - `<xfina-select>` reads `<optgroup>`: each group gets a label, and separators divide the sections, as shadcn's Select draws them. For data.xfina.dev's dataset picker, grouped as its index is.

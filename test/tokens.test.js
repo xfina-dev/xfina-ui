@@ -52,3 +52,29 @@ test("the chart palette keeps its eight slots in order", () => {
     assert.deepEqual(slots, ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-7", "chart-8"]);
   }
 });
+
+test("status text reads at 4.5:1 on its badge's tint, in both modes", () => {
+  // Badges set small bold text on a 12% tint of their status over the page
+  // surface. The status colours are too light for that on white, which is why
+  // each has a -text step; this holds every step to WCAG's 4.5:1.
+  const hex = (v) => [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16));
+  const luminance = (rgb) => {
+    const [r, g, b] = rgb.map((c) => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a, b) => {
+    const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+  const surfaces = { light: "#ffffff", dark: "#09090b" };
+  for (const [mode, surface] of Object.entries(surfaces)) {
+    for (const status of ["good", "warning", "serious", "critical"]) {
+      const tint = hex(colours[mode][`status-${status}`]).map((c, i) => Math.round(c * 0.12 + hex(surface)[i] * 0.88));
+      const ratio = contrast(hex(colours[mode][`status-${status}-text`]), tint);
+      assert.ok(ratio >= 4.5, `${mode} ${status}: ${ratio.toFixed(2)}:1`);
+    }
+  }
+});

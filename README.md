@@ -1,6 +1,6 @@
 # xfina-ui
 
-The shared look of the xfina.dev sites. This repo provides the colours, light and dark mode, and the header and footer, so the three sites read as one product.
+The shared look of the xfina.dev sites: the colours, light and dark mode, the header and footer, and every UI component, so the three sites read as one product.
 
 | | What it is | Where |
 |---|---|---|
@@ -11,7 +11,7 @@ The shared look of the xfina.dev sites. This repo provides the colours, light an
 
 Other products, such as xsteer.in and sakthipriyan.com, use these libraries and datasets with their own UI. They do not use xfina-ui.
 
-It holds only what must be identical on every site. A site's own components, such as tables, charts and dialogs, stay in that site's repository.
+A site holds only how its pages are composed, in HTML or Vue templates, and its own logic. It defines no colour and no component of its own.
 
 ## What it provides
 
@@ -79,6 +79,33 @@ The picker beside the title, drawn the way Labs and xfina.dev draw theirs with s
 
 The keyboard follows the ARIA combobox pattern. Arrow keys, Enter or Space open the menu. In the open menu, the arrows, Home and End move the highlight, Enter or Space chooses, and Escape or Tab closes it.
 
+### Components (`xf-*` classes)
+
+Styling-only components, copying shadcn's. The same class works in plain HTML and in a Vue template, and replaces the shadcn component of the same name.
+
+| Class | Replaces | Parts and variants |
+|---|---|---|
+| `xf-btn` | `Button` | `xf-btn-outline`, `-secondary`, `-ghost`, `-destructive`, `-link`; sizes `xf-btn-sm` (36px), `xf-btn-lg`, `xf-btn-icon` |
+| `xf-segmented` | Labs' `Seg` | A row of `<button>`s; mark the chosen one `aria-pressed="true"` |
+| `xf-card` | `Card` | `xf-card-header`, `-title`, `-description`, `-content`, `-footer` |
+| `xf-input` | `Input` | `xf-input-sm` (36px) |
+| `xf-label` | `Label` | |
+| `xf-badge` | Labs' `Tag` | `xf-badge-good`, `-warning`, `-critical`, `-soon` (planned, dashed) |
+| `xf-table` | `Table` | Style a plain `<table>` with its `thead`, `tbody`, `tfoot` and `caption` |
+| `xf-pre`, `xf-prose` | | A code or request block; running text in a card |
+| `xf-muted`, `xf-sr-only`, `xf-stack` | | Muted text, screen-reader-only text, and sections 32px apart |
+
+### Charts (`XfinaUI.chart`)
+
+| | |
+|---|---|
+| `series()` | The eight series colours as `rgb()`, in the order they are assigned |
+| `ramp("seq" \| "div")` | Five steps for magnitude, or for change (fall, none, rise) |
+| `colour("--token")` | Any token as `rgb()`. Throws if the token is not defined |
+| `echarts()` | `{ color, textStyle, legend, tooltip, axis }` to spread into an ECharts option, so every chart has the same text, axes, legend and tooltip |
+
+Read the colours at draw time, and again on `themechange`.
+
 ### Tokens
 
 Every colour is an HSL triplet, as shadcn defines them, so any site uses it as `hsl(var(--name))`. Tailwind sites keep their existing `tailwind.config.js` colour mapping and remove their own `:root` and `.dark` blocks.
@@ -86,7 +113,7 @@ Every colour is an HSL triplet, as shadcn defines them, so any site uses it as `
 - **Interface:** shadcn zinc (`--background`, `--foreground`, `--primary`, `--muted`, `--border`, …).
 - **Charts:** `--chart-1` to `--chart-8`. Assign them in order. The order is what keeps neighbouring series apart for colour-blind readers.
 - **Ramps:** `--seq-1..5` for magnitude, and `--div-1..5` for change (fall, none, rise).
-- **Status:** `--status-good`, `--status-warning`, `--status-serious`, `--status-critical`. These mark a state, not a series, and always appear with an icon and a label.
+- **Status:** `--status-good`, `--status-warning`, `--status-serious`, `--status-critical`. These mark a state, not a series, and always appear with an icon or a label. Text in a status colour uses its `-text` step, such as `--status-warning-text`, which reaches 4.5:1 where the status colour itself would not.
 
 `themechange` is dispatched on `window`, with `detail.dark`, every time the theme changes, so a chart can redraw in the other palette.
 
