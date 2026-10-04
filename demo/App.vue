@@ -6,7 +6,7 @@ import * as echarts from "echarts";
 import { Check } from "lucide-vue-next";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
-  Badge, Button,
+  Badge, Button, CopyField,
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
   Input, Label, Segmented,
@@ -133,6 +133,7 @@ watch(site, () => setTimeout(resize));
             <Check v-if="added" class="!size-3.5" />{{ added ? "Added" : "Add" }}
           </Button>
         </div>
+        <CopyField value="https://data.xfina.dev/v1/inflation/in-cpi-imf.csv" href="#" />
         <div class="flex flex-wrap items-center gap-2">
           <Badge>Recommended</Badge>
           <Badge variant="good">Valid</Badge>

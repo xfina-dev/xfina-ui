@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- **`CopyField`:** a value and its copy button joined into one control, such as a dataset's URL. The button keeps one width whether it says "Copy" or "Copied", so nothing shifts, and confirms a copy the way an added item is marked: a check, a primary outline and a faint tint. A refused clipboard shows "Failed" rather than claiming a copy. The value can be a link.
+
 ## 0.5.0
 
 - **Family order:** Xfina, Xfingine, Xfina Data, Xfina Labs: the flagship, then the engine, the data and the apps built on them. The header's switcher follows the same order.
