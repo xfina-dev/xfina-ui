@@ -22,6 +22,9 @@ const host = (url) => new URL(url).host;
 
 <template>
   <section aria-labelledby="xfina-family-title" class="space-y-10">
+    <!-- Sites place this at the foot of a page, straight after their own
+         content; without a rule the family reads as more of that page. -->
+    <hr class="border-border" />
     <div>
       <div class="max-w-2xl">
         <h2 id="xfina-family-title" class="text-2xl font-semibold tracking-tight">
