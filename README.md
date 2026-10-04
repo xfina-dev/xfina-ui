@@ -80,6 +80,7 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | | |
 |---|---|
 | `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
+| `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
 | `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
 | `cn()` | shadcn's class merger, for composing classes |
