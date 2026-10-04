@@ -110,7 +110,7 @@ watch(site, () => setTimeout(resize));
       <section class="space-y-3">
         <h2 class="text-xl font-semibold tracking-tight">Header</h2>
         <p class="text-sm text-muted-foreground">One component with a different <code>site</code>; each site supplies its own picker.</p>
-        <Segmented v-model="site" label="Site" :options="[{ value: 'xfina', label: 'Xfina' }, { value: 'labs', label: 'Labs' }, { value: 'data', label: 'Data' }]" />
+        <Segmented v-model="site" label="Site" :options="[{ value: 'xfina', label: 'Xfina' }, { value: 'data', label: 'Data' }, { value: 'labs', label: 'Labs' }]" />
       </section>
 
       <section class="space-y-4">

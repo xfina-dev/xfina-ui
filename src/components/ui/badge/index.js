@@ -11,7 +11,7 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-primary/20 bg-primary/10 text-primary",
+        default: "border-primary/20 bg-primary/10 text-primary-text",
         good: "border-status-good/40 bg-status-good/[0.12] text-status-good-text",
         warning: "border-status-warning/40 bg-status-warning/[0.12] text-status-warning-text",
         critical: "border-status-critical/40 bg-status-critical/[0.12] text-status-critical-text",

@@ -5,9 +5,9 @@ The theme and UI components of the xfina.dev sites, as one npm package: a Tailwi
 | | What it is | Where |
 |---|---|---|
 | **Xfina** (flagship) | The statement parser, published as a library and with its own UI, which is versioned | [xfina.dev](https://xfina.dev) |
-| **Xfina Labs** | Apps built on Xfina and Xfingine, starting with the Portfolio Engine; not versioned | [labs.xfina.dev](https://labs.xfina.dev) |
 | **Xfingine** | The core engine library. It has no site; its help pages are on crates.io, npm and PyPI | [GitHub](https://github.com/xfina-dev/xfingine) |
 | **Xfina Data** | Open datasets (FX and inflation, with more as needed) | [data.xfina.dev](https://data.xfina.dev) |
+| **Xfina Labs** | Apps built on Xfina and Xfingine, starting with the Portfolio Engine; not versioned | [labs.xfina.dev](https://labs.xfina.dev) |
 
 Other products, such as xsteer.in and sakthipriyan.com, use these libraries and datasets with their own UI. They do not use xfina-ui.
 
@@ -95,11 +95,11 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `#context` | The site's picker beside the title: version on Xfina, app on Labs, dataset on Data |
 | `#tagline`, `#actions` | Replace the tagline; add buttons before privacy and theme |
 
-The switcher lists the rest of the family (`Xfina · Labs · Xfingine · Data`, without the current site). Xfingine opens its GitHub repository in a new tab.
+The switcher lists the rest of the family (`Xfina · Xfingine · Data · Labs`, without the current site), followed by the site's GitHub repository, privacy and the theme toggle. Xfingine opens its GitHub repository in a new tab. Products built on the family are not in the header; they are in `XfinaFamily`'s "Used by" row.
 
 ### `XfinaFamily`
 
-One card per member of the family, as xsteer.in shows its projects; pass `site` to mark the current one. Below them, set apart and smaller, **Used by**: the products built on the family (Xsteer, The Personal Finance OS, on Xfina, Xfingine and Xfina Data; Building Wealth's RealValue Portfolio on Xfina Data), from `USED_BY`. They have their own brands, so they are not drawn as members.
+One card per member of the family, as xsteer.in shows its projects; pass `site` to mark the current one. Below them, set apart and smaller, **Used by**: the products built on the family (Building Wealth, on Xfina Data and moving to Xfina and Xfingine; Xsteer, The Personal Finance OS, on Xfina, Xfingine and Xfina Data), from `USED_BY`. They have their own brands, so they are not drawn as members.
 
 ### Theme and charts
 
@@ -116,7 +116,7 @@ Read chart colours at draw time and again on the `themechange` window event.
 
 Colours are HSL triplets, used through the preset (`bg-primary`, `text-muted-foreground`, `bg-chart-1`, `text-status-warning-text`, with opacity such as `bg-primary/10`) or directly as `hsl(var(--name))`.
 
-- **Interface:** shadcn zinc.
+- **Interface:** shadcn zinc, except `primary`, which is the brand blue from the logo (white text in both modes). Blue used as text takes `primary-text`, which stays readable on the dark surface.
 - **Charts:** `chart-1` … `chart-8`. Assign them in order: the order keeps neighbouring series apart for colour-blind readers.
 - **Ramps:** `seq-1..5` for magnitude, `div-1..5` for change.
 - **Status:** `status-good`, `-warning`, `-serious`, `-critical`, each with a `-text` step for text. They mark a state, never a series.

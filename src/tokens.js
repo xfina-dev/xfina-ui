@@ -17,8 +17,10 @@ const ui = {
     "card-foreground": "240 10% 3.9%",
     popover: "0 0% 100%",
     "popover-foreground": "240 10% 3.9%",
-    primary: "240 5.9% 10%",
-    "primary-foreground": "0 0% 98%",
+    // Not shadcn zinc: the brand blue from the logo, so a default button,
+    // a selection and a badge read as Xfina rather than as near-black.
+    primary: "#4457d9",
+    "primary-foreground": "#ffffff",
     secondary: "240 4.8% 95.9%",
     "secondary-foreground": "240 5.9% 10%",
     muted: "240 4.8% 95.9%",
@@ -38,8 +40,11 @@ const ui = {
     "card-foreground": "0 0% 98%",
     popover: "240 10% 3.9%",
     "popover-foreground": "0 0% 98%",
-    primary: "0 0% 98%",
-    "primary-foreground": "240 5.9% 10%",
+    // A step lighter than light mode's, still with white text. zinc's
+    // near-white primary made every default button the brightest thing on
+    // a dark page.
+    primary: "#5163de",
+    "primary-foreground": "#ffffff",
     secondary: "240 3.7% 15.9%",
     "secondary-foreground": "0 0% 98%",
     muted: "240 3.7% 15.9%",
@@ -97,6 +102,17 @@ const status = {
   "status-critical": "#d03b3b",
 };
 
+// The brand blue as text: a link, a badge's label, a hovered title. In dark
+// mode the button blue is too dark to read as text on the page (4.0:1), so
+// text takes a lighter step. Held to 4.5:1 on the page and on a 10% tint of
+// the button blue by a test:
+//   light: 5.8 on the page, 5.0 on the tint
+//   dark:  6.5 on the page, 6.1 on the tint
+const primaryText = {
+  light: { "primary-text": "#4457d9" },
+  dark: { "primary-text": "#7d8cf2" },
+};
+
 // Status as text, such as a badge's label. The status colours themselves are
 // too light to read as small text on a light surface (warning is 1.7:1), so
 // text takes a step that reaches 4.5:1 on the badge's 12% tint of its status,
@@ -124,7 +140,7 @@ function mode(name) {
   for (const [ramp, steps] of Object.entries(ramps[name])) {
     steps.forEach((hex, i) => (out[`${ramp}-${i + 1}`] = hex));
   }
-  return { ...out, ...status, ...statusText[name] };
+  return { ...out, ...primaryText[name], ...status, ...statusText[name] };
 }
 
 export const colours = { light: mode("light"), dark: mode("dark") };

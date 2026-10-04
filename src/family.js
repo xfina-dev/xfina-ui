@@ -1,5 +1,5 @@
-// The family, in the order the switcher and the family cards show it. Xfina,
-// the flagship, comes first. A new member is a row here and a release, and
+// The family, in the order the switcher and the family cards show it: Xfina,
+// the flagship, then the engine, the data and the apps built on them. A new member is a row here and a release, and
 // every site learns it on its next upgrade.
 //
 // Xfingine has no site: it is a library, documented on crates.io, npm and
@@ -21,19 +21,6 @@ export const FAMILY = Object.freeze(
       tagline:
         "e<strong>X</strong>tract <strong>fina</strong>ncial statements entirely in your browser with Rust/Wasm<br>" +
         "Fast, private, zero-setup, and without uploading your files to any server.",
-    },
-    {
-      id: "labs",
-      label: "Labs",
-      title: "Xfina Labs",
-      url: "https://labs.xfina.dev/",
-      repo: "xfina-dev/xfina-labs",
-      role: "Finance tools",
-      about:
-        "Apps built on Xfina and Xfingine, starting with the Portfolio Engine. Everything runs in your browser; nothing is uploaded.",
-      tagline:
-        "Experimental finance tools for long-term investors.<br>" +
-        "Everything runs in your browser; nothing is uploaded to any server.",
     },
     {
       id: "xfingine",
@@ -59,6 +46,19 @@ export const FAMILY = Object.freeze(
         "Open Indian financial data as plain CSV, previewed before you use it.<br>" +
         "Every value traces back to a source document kept unchanged in a public archive.",
     },
+    {
+      id: "labs",
+      label: "Labs",
+      title: "Xfina Labs",
+      url: "https://labs.xfina.dev/",
+      repo: "xfina-dev/xfina-labs",
+      role: "Finance tools",
+      about:
+        "Apps built on Xfina and Xfingine, starting with the Portfolio Engine. Everything runs in your browser; nothing is uploaded.",
+      tagline:
+        "Experimental finance tools for long-term investors.<br>" +
+        "Everything runs in your browser; nothing is uploaded to any server.",
+    },
   ].map((member) => Object.freeze(member)),
 );
 
@@ -66,10 +66,21 @@ export const SITES = Object.freeze(FAMILY.filter((member) => !member.external));
 
 // Products built on the family, shown under it. They are not part of it:
 // each has its own brand and its own UI, and none uses xfina-ui. `uses`
-// names the family members each one is built on, and `status`, if set, is
-// shown as a badge.
+// names the family members each one is built on today, `planned` the ones it
+// is moving to, and `status`, if set, is shown as a badge.
 export const USED_BY = Object.freeze(
   [
+    {
+      id: "building-wealth",
+      title: "Building Wealth",
+      url: "https://sakthipriyan.com/building-wealth",
+      role: "Personal finance writing and tools",
+      about:
+        "Writing on building long-term wealth from India: investing, tax, and moving money abroad. Its tools include RealValue Portfolio, which tracks mutual fund and IBKR holdings in real rupees, at SBI's TT rates and net of Indian inflation.",
+      uses: ["data"],
+      // Its calculations are moving onto the family's libraries.
+      planned: ["xfina", "xfingine"],
+    },
     {
       id: "xsteer",
       title: "Xsteer",
@@ -80,23 +91,10 @@ export const USED_BY = Object.freeze(
       uses: ["xfina", "xfingine", "data"],
       status: "In active development",
     },
-    {
-      id: "building-wealth",
-      title: "Building Wealth",
-      url: "https://sakthipriyan.com/building-wealth/tools/realvalue-portfolio/",
-      // The part of the site built on the family, named so a reader knows
-      // where to look.
-      role: "RealValue Portfolio",
-      about:
-        "Mutual fund and IBKR holdings in one place, with XIRR and returns in real rupees: US dollars at SBI's TT rates, and growth net of Indian inflation.",
-      uses: ["data"],
-    },
-  ].map((product) => Object.freeze({ ...product, uses: Object.freeze(product.uses) })),
+  ].map((product) =>
+    Object.freeze({ ...product, uses: Object.freeze(product.uses), planned: Object.freeze(product.planned ?? []) }),
+  ),
 );
-
-// The author's writing on personal finance, where these tools come from.
-// Labelled by what the reader finds there rather than by its domain.
-export const AUTHOR = Object.freeze({ label: "Building Wealth", url: "https://sakthipriyan.com/building-wealth" });
 
 // A misspelt site would otherwise draw a header for no site at all. Fail where
 // the author will see it.

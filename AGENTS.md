@@ -3,9 +3,9 @@
 xfina-ui is the theme and the UI components of the xfina.dev sites, published to npm as `xfina-ui`. Every site is Vue + Tailwind + Vite, and every site takes its look from this package, so three repositories read as one product.
 
 - **Xfina** is the flagship: the statement parser, published as a library and with its own versioned UI at xfina.dev.
-- **Xfina Labs**: unversioned apps at labs.xfina.dev, built on Xfina and Xfingine. The first is the Portfolio Engine.
 - **Xfingine** is the core engine. It has no site, only its GitHub repository and its pages on crates.io, npm and PyPI. The switcher links to its repository, and it is never a `site` value.
 - **Xfina Data**: open datasets at data.xfina.dev.
+- **Xfina Labs**: unversioned apps at labs.xfina.dev, built on Xfina and Xfingine. The first is the Portfolio Engine.
 
 Other products, such as xsteer.in and sakthipriyan.com, use Xfina, Xfingine and the datasets with their own UI. This package is for the xfina.dev sites only, and no library may depend on it.
 

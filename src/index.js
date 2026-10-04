@@ -20,7 +20,7 @@ export { default as XfinaHeader } from "./components/xfina/XfinaHeader.vue";
 export { default as XfinaFamily } from "./components/xfina/XfinaFamily.vue";
 export { default as XfinaProvider } from "./components/xfina/XfinaProvider.vue";
 
-export { AUTHOR, FAMILY, SITES, USED_BY, siteFor } from "./family.js";
+export { FAMILY, SITES, USED_BY, siteFor } from "./family.js";
 export { useXfinaTheme } from "./theme.js";
 export * as chart from "./chart.js";
 export { cn } from "./lib/utils.js";
