@@ -79,3 +79,29 @@ test("status text reads at 4.5:1 on its badge's tint, in both modes", () => {
     }
   }
 });
+
+test("the brand blue reads as a button, as an outline and as text, in both modes", () => {
+  const hex = (v) => [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16));
+  const luminance = (rgb) => {
+    const [r, g, b] = rgb.map((c) => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a, b) => {
+    const [x, y] = [luminance(hex(a)), luminance(hex(b))].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+  const tint = (fg, bg, a) => "#" + hex(fg).map((c, i) => Math.round(c * a + hex(bg)[i] * (1 - a)).toString(16).padStart(2, "0")).join("");
+  for (const [mode, page] of Object.entries({ light: "#ffffff", dark: "#09090b" })) {
+    const t = colours[mode];
+    // A default button's label.
+    assert.ok(contrast(t["primary-foreground"], t.primary) >= 4.5, `${mode} button text`);
+    // A selected outline against the page: 3:1 for a non-text control.
+    assert.ok(contrast(t.primary, page) >= 3, `${mode} outline`);
+    // Blue text on the page and on a badge's tint.
+    assert.ok(contrast(t["primary-text"], page) >= 4.5, `${mode} text on the page`);
+    assert.ok(contrast(t["primary-text"], tint(t.primary, page, 0.1)) >= 4.5, `${mode} text on a tint`);
+  }
+});

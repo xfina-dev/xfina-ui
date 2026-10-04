@@ -18,7 +18,7 @@ const links = (wrapper) => wrapper.findAll("nav > div:first-child a");
 
 describe("XfinaHeader", () => {
   test("names its site, and the switcher offers the rest of the family in order", () => {
-    const expected = { xfina: ["Labs", "Xfingine", "Data"], labs: ["Xfina", "Xfingine", "Data"], data: ["Xfina", "Labs", "Xfingine"] };
+    const expected = { xfina: ["Xfingine", "Data", "Labs"], labs: ["Xfina", "Xfingine", "Data"], data: ["Xfina", "Xfingine", "Labs"] };
     for (const [site, labels] of Object.entries(expected)) {
       const wrapper = mount(XfinaHeader, { props: { site } });
       expect(wrapper.text()).toContain(SITES.find((s) => s.id === site).title);
@@ -73,16 +73,17 @@ describe("XfinaHeader", () => {
     expect(own.emitted("privacy")).toHaveLength(1);
   });
 
-  test("Building Wealth opens the author's page in a new tab", () => {
+  test("links only the family: products built on it are in the family cards", () => {
     const wrapper = mount(XfinaHeader, { props: { site: "data" } });
-    const link = wrapper.findAll("a").find((a) => a.text() === "Building Wealth");
-    expect(link.attributes("href")).toBe("https://sakthipriyan.com/building-wealth");
-    expect(link.attributes("target")).toBe("_blank");
+    const hrefs = wrapper.findAll("a").map((a) => a.attributes("href"));
+    for (const product of USED_BY) expect(hrefs).not.toContain(product.url);
+    expect(wrapper.text()).not.toContain("Building Wealth");
   });
 });
 
 describe("XfinaFamily", () => {
   test("one card per member, in order; this site's card says so and does not link", () => {
+    expect(FAMILY.map((m) => m.title)).toEqual(["Xfina", "Xfingine", "Xfina Data", "Xfina Labs"]);
     const wrapper = mount(XfinaFamily, { props: { site: "labs" } });
     const cards = wrapper.findAll("h3").map((h) => h.text().replace("· this site", "").trim()).filter((t) => t !== "Used by");
     expect(cards).toEqual(FAMILY.map((m) => m.title));
@@ -95,18 +96,18 @@ describe("XfinaFamily", () => {
   test("lists the products built on the family apart, with what each uses", () => {
     const wrapper = mount(XfinaFamily, { props: { site: "data" } });
     const usedBy = wrapper.findAll("a[target=_blank]").filter((a) => USED_BY.some((p) => p.url === a.attributes("href")));
-    expect(usedBy.map((a) => a.attributes("href"))).toEqual([
-      "https://xsteer.in/",
-      "https://sakthipriyan.com/building-wealth/tools/realvalue-portfolio/",
-    ]);
-    expect(usedBy[0].text()).toContain("The Personal Finance OS");
-    expect(usedBy[0].text()).toContain("In active development");
-    expect(usedBy[0].text()).toContain("Built on Xfina, Xfingine and Xfina Data");
-    expect(usedBy[1].text()).toContain("RealValue Portfolio");
-    expect(usedBy[1].text()).toContain("Built on Xfina Data");
-    expect(usedBy[1].text()).not.toContain("In active development");
+    expect(usedBy.map((a) => a.attributes("href"))).toEqual(["https://sakthipriyan.com/building-wealth", "https://xsteer.in/"]);
+    const [wealth, xsteer] = usedBy.map((a) => a.text().replace(/\s+/g, " "));
+    expect(wealth).toContain("Personal finance writing and tools");
+    expect(wealth).toContain("RealValue Portfolio");
+    expect(wealth).toContain("Built on Xfina Data · moving to Xfina and Xfingine");
+    expect(wealth).not.toContain("In active development");
+    expect(xsteer).toContain("The Personal Finance OS");
+    expect(xsteer).toContain("In active development");
+    expect(xsteer).toContain("Built on Xfina, Xfingine and Xfina Data");
+    expect(xsteer).not.toContain("moving to");
     // Every product names only real family members.
-    for (const p of USED_BY) for (const id of p.uses) expect(FAMILY.map((m) => m.id)).toContain(id);
+    for (const p of USED_BY) for (const id of [...p.uses, ...p.planned]) expect(FAMILY.map((m) => m.id)).toContain(id);
   });
 });
 
@@ -139,6 +140,10 @@ describe("Segmented", () => {
     // A filled primary is a near-white block in dark mode.
     expect(five.classes()).not.toContain("bg-primary");
     expect(five.classes()).toContain("bg-primary/5");
+    // The end buttons follow the group's rounded inside corner, so a chosen
+    // end button's outline closes.
+    expect(one.classes()).toContain("first:rounded-l-[calc(var(--radius)-3px)]");
+    expect(five.classes()).toContain("last:rounded-r-[calc(var(--radius)-3px)]");
     await one.trigger("click");
     expect(wrapper.emitted("update:modelValue")).toEqual([["1Y"]]);
   });

@@ -5,6 +5,9 @@
 // lines up with size="sm" buttons and inputs beside it. The chosen one is
 // drawn as Button's `selected` variant is: a primary outline on a faint
 // tint, never a filled primary, which in dark mode is a near-white block.
+// The end buttons are rounded to the group's inside corner (its radius less
+// its 1px border). Square, an end button's outline was cut off by the
+// group's rounded corner and did not close.
 import { computed } from "vue";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +34,7 @@ const items = computed(() =>
       type="button"
       :aria-pressed="o.value === modelValue"
       :disabled="disabled.includes(o.value)"
-      class="h-[34px] px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+      class="h-[34px] px-3 text-sm font-medium transition-colors first:rounded-l-[calc(var(--radius)-3px)] last:rounded-r-[calc(var(--radius)-3px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
       :class="o.value === modelValue ? 'bg-primary/5 shadow-[inset_0_0_0_1px_hsl(var(--primary))] hover:bg-primary/10' : 'bg-background hover:bg-accent hover:text-accent-foreground'"
       @click="$emit('update:modelValue', o.value)"
     >

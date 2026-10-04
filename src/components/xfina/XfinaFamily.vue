@@ -46,7 +46,7 @@ const host = (url) => new URL(url).host;
           class="group rounded-lg border bg-card p-6 text-card-foreground no-underline transition-colors"
           :class="m.id === site ? 'border-primary bg-primary/5' : 'hover:border-primary/40'"
         >
-          <h3 class="font-semibold tracking-tight transition-colors group-hover:text-primary">
+          <h3 class="font-semibold tracking-tight transition-colors group-hover:text-primary-text">
             {{ m.title }}
             <span v-if="m.id === site" class="ml-1 text-xs font-medium text-muted-foreground">· this site</span>
           </h3>
@@ -68,7 +68,7 @@ const host = (url) => new URL(url).host;
           class="group flex flex-col rounded-lg border border-dashed p-5 no-underline transition-colors hover:border-primary/40"
         >
           <span class="flex items-baseline justify-between gap-3">
-            <span class="font-semibold tracking-tight transition-colors group-hover:text-primary">{{ p.title }}</span>
+            <span class="font-semibold tracking-tight transition-colors group-hover:text-primary-text">{{ p.title }}</span>
             <span class="truncate text-xs text-muted-foreground">{{ host(p.url) }}</span>
           </span>
           <span class="mt-1 flex flex-wrap items-center gap-2">
@@ -76,7 +76,12 @@ const host = (url) => new URL(url).host;
             <Badge v-if="p.status">{{ p.status }}</Badge>
           </span>
           <span class="mt-3 text-sm leading-relaxed text-muted-foreground">{{ p.about }}</span>
-          <span class="mt-3 text-xs text-muted-foreground">Built on <span class="font-medium text-foreground">{{ builtOn(p.uses) }}</span></span>
+          <span class="mt-3 text-xs text-muted-foreground">
+            Built on <span class="font-medium text-foreground">{{ builtOn(p.uses) }}</span>
+            <template v-if="p.planned.length">
+              · moving to <span class="font-medium text-foreground">{{ builtOn(p.planned) }}</span>
+            </template>
+          </span>
         </a>
       </div>
     </div>

@@ -1,19 +1,21 @@
 <script setup>
 // The header every xfina.dev site draws: logo, title, the site's own picker,
-// tagline, the switcher to the rest of the family, Building Wealth, the
-// repository, privacy and the theme toggle.
+// tagline, the switcher to the rest of the family, the repository, privacy
+// and the theme toggle. It is the family's own navigation only: products
+// built on the family (Building Wealth, Xsteer) are in XfinaFamily's "Used
+// by" row, side by side, rather than one of them here.
 //
 // From 1024px the buttons share the title's line and the tagline runs the
 // full width beneath both. Beside the title and tagline together they left
 // the tagline under 480px, wrapped to four lines. Narrower, they move to a
 // row of their own under the tagline. At 1024px the column holds the logo,
 // the widest title with its picker (xfina.dev's version picker and commit
-// hash, ~330px) and the ~480px of buttons.
+// hash, ~330px) and the ~340px of buttons.
 import { computed, ref } from "vue";
 import { Activity, Github, Moon, Sun } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AUTHOR, FAMILY, siteFor } from "@/family.js";
+import { FAMILY, siteFor } from "@/family.js";
 import { useXfinaTheme } from "@/theme.js";
 import logo from "@/logo.svg?raw";
 
@@ -51,7 +53,7 @@ function privacy() {
     </a>
 
     <div class="col-start-2 row-start-1 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-      <a :href="home" class="no-underline transition-colors hover:text-primary">
+      <a :href="home" class="no-underline transition-colors hover:text-primary-text">
         <component :is="heading ? 'h1' : 'span'" class="block whitespace-nowrap text-3xl font-bold tracking-tight">
           {{ site.title }}
         </component>
@@ -83,9 +85,6 @@ function privacy() {
           {{ m.label }}<span v-if="m.external" class="sr-only"> (GitHub, opens in a new tab)</span>
         </Button>
       </div>
-      <Button as="a" :href="AUTHOR.url" target="_blank" rel="noopener noreferrer" variant="outline" size="sm" class="shadow-sm">
-        {{ AUTHOR.label }}
-      </Button>
       <Button
         as="a"
         :href="`https://github.com/${site.repo}`"
