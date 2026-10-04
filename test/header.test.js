@@ -93,6 +93,13 @@ describe("XfinaFamily", () => {
     expect(wrapper.findAll("a")).toHaveLength(FAMILY.length - 1 + USED_BY.length);
   });
 
+  test("a rule sets the family apart from the page above it, before the heading", () => {
+    const section = mount(XfinaFamily, { props: { site: "data" } }).find("section").element;
+    const hr = section.querySelector("hr");
+    expect(section.firstElementChild).toBe(hr);
+    expect(hr.compareDocumentPosition(section.querySelector("h2")) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   test("lists the products built on the family apart, with what each uses", () => {
     const wrapper = mount(XfinaFamily, { props: { site: "data" } });
     const usedBy = wrapper.findAll("a[target=_blank]").filter((a) => USED_BY.some((p) => p.url === a.attributes("href")));
