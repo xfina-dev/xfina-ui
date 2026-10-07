@@ -6,10 +6,10 @@ import * as echarts from "echarts";
 import { Check } from "lucide-vue-next";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
-  Badge, Button, CopyField,
+  Badge, Button, ColorPicker, CopyField,
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
-  Input, Label, Segmented,
+  Input, Label, Popover, PopoverContent, PopoverTrigger, Segmented,
   Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   Tooltip, TooltipContent, TooltipTrigger,
@@ -22,6 +22,21 @@ const app = ref("portfolio");
 const version = ref("0.8");
 const period = ref("5Y");
 const added = ref(true);
+
+// Labs' Allocation table: each asset picks its colour, defaults in slot order.
+const assets = ref([
+  { name: "Nifty 50", color: "chart-1", weight: 40 },
+  { name: "Nasdaq 100", color: "chart-2", weight: 30 },
+  { name: "Gold", color: "chart-3", weight: 20 },
+  { name: "Bonds", color: "chart-4", weight: 10 },
+]);
+const usedBy = (self) =>
+  Object.fromEntries(
+    [...new Set(assets.value.filter((a) => a !== self).map((a) => a.color))].map((c) => [
+      c,
+      assets.value.filter((a) => a !== self && a.color === c).map((a) => a.name).join(", "),
+    ]),
+  );
 
 const plot = ref(null);
 let instance;
@@ -190,6 +205,39 @@ watch(site, () => setTimeout(resize));
         </Table>
       </Card>
 
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">Colour picker, popover</h2>
+        <p class="text-sm text-muted-foreground">
+          <code>ColorPicker</code>: the sixteen chart colours grouped by hue, a dot on those another asset uses. Arrow keys move, Enter picks.
+        </p>
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow><TableHead>Asset</TableHead><TableHead class="w-1/2">Weight</TableHead><TableHead class="text-right">%</TableHead></TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="a in assets" :key="a.name">
+                <TableCell class="font-medium">
+                  <div class="flex items-center gap-2">
+                    <ColorPicker v-model="a.color" :label="`Colour for ${a.name}`" :used="usedBy(a)" />
+                    <span>{{ a.name }}</span>
+                  </div>
+                </TableCell>
+                <TableCell><div class="h-2 overflow-hidden rounded-full bg-muted"><div class="h-full" :style="{ width: `${a.weight * 2}%`, background: `hsl(var(--${a.color}))` }" /></div></TableCell>
+                <TableCell class="text-right tabular-nums">{{ a.weight }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Card>
+        <Popover>
+          <PopoverTrigger as-child><Button size="sm" variant="outline">Open popover</Button></PopoverTrigger>
+          <PopoverContent class="space-y-1 text-sm">
+            <p class="font-medium">Popover</p>
+            <p class="text-muted-foreground">shadcn's Popover, from xfina-ui.</p>
+          </PopoverContent>
+        </Popover>
+      </section>
+
       <Accordion type="single" collapsible class="w-full">
         <AccordionItem value="a">
           <AccordionTrigger>Accordion</AccordionTrigger>
@@ -201,6 +249,11 @@ watch(site, () => setTimeout(resize));
         <h2 class="text-xl font-semibold tracking-tight">Chart theme</h2>
         <p class="text-sm text-muted-foreground"><code>chart.echarts()</code>: the same text, axes, legend, tooltip and series colours on every chart. It redraws with the theme.</p>
         <Card><CardContent class="pt-6"><div ref="plot" class="h-72 w-full" /></CardContent></Card>
+        <div class="flex flex-wrap gap-1.5" aria-label="The chart palette, in slot order">
+          <div v-for="k in 16" :key="k" class="w-10 space-y-1 text-center text-xs text-muted-foreground tabular-nums">
+            <div class="h-8 rounded-md" :style="{ background: `hsl(var(--chart-${k}))` }" />{{ k }}
+          </div>
+        </div>
       </section>
 
       <XfinaFamily :site="site" />
