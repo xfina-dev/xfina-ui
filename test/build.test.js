@@ -43,6 +43,10 @@ describe("the Tailwind preset", () => {
       ".bg-status-good\\/\\[0\\.12\\]",
       ".border-status-critical\\/40",
       ".bg-primary\\/10",
+      // ColorPicker's marks, drawn in the popover's colours in both modes.
+      ".border-popover",
+      ".bg-popover-foreground",
+      ".ring-offset-popover",
     ]) {
       expect(css, cls).toContain(cls);
     }

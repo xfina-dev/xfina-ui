@@ -63,20 +63,47 @@ const ui = {
 // neighbouring series apart for colour-blind readers, so a chart takes
 // chart-1, chart-2, ... and never picks colours out of sequence.
 //
-// Validated (dataviz validate_palette.js, 2026-10-03) against these sites'
-// own surfaces, white and zinc-950:
+// Validated (dataviz validate_palette.js, 2026-10-03 for slots 1-8,
+// 2026-10-07 for all sixteen) against these sites' own surfaces, white and
+// zinc-950, on the adjacent pairlist (neighbours in slot order):
 //   light on #ffffff: worst adjacent CVD ΔE 9.1, normal-vision ΔE 19.6. Slots
 //     3, 4 and 5 are below 3:1 contrast, so a chart using them needs direct
-//     labels or a table view.
-//   dark on #09090b: worst adjacent CVD ΔE 8.4, normal-vision ΔE 19.3, all
+//     labels or a table view; slots 9-16 are all at 3:1 or more.
+//   dark on #09090b: worst adjacent CVD ΔE 8.4, normal-vision ΔE 17.3, all
 //     slots at 3:1 or more.
+// Slots 1-8 are the dataviz reference palette, unchanged. Slots 9-16 were
+// searched for, not picked by eye: inside each mode's lightness band, chroma
+// 0.10 or more and 3:1 on the surface, the set whose neighbours (from slot 8
+// on) clear the gates and whose closest pair anywhere is farthest apart. That
+// closest pair is about half the gates (normal-vision ΔE 7.9 light, slots 11
+// and 16) and cannot be made wider: sixteen colours in these bands do not
+// all stay apart. So past eight series, some series that are not neighbours
+// look alike, and a chart that shows more than eight names each one (a
+// legend and direct labels, or a table), never by colour alone.
 // Scatter plots and other charts where every pair of series can sit side by
 // side are only safe with the first three slots. Change any value here and the
 // validator runs again, against both surfaces, before the change merges.
 const chart = {
-  light: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"],
-  dark: ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"],
+  light: [
+    "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948",
+    "#76317d", "#4a621b", "#a2316e", "#4696c0", "#6443cc", "#b46669", "#7085ff", "#935785",
+  ],
+  dark: [
+    "#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767",
+    "#8c4593", "#6e8843", "#b3417d", "#4999c3", "#7c60eb", "#974c50", "#4350c4", "#b677a6",
+  ],
 };
+
+// How many series colours there are, for the chart helpers and ColorPicker.
+export const chartSlots = chart.light.length;
+
+// The slots around the colour wheel, for showing them to a reader who is
+// choosing one (ColorPicker): reds to yellow, greens to sky, blues to
+// violets, purples to pinks. In slot order the neighbours are deliberately
+// unlike, so finding "a green" meant scanning all sixteen. This is only how
+// they are shown: a chart still assigns them in slot order. The same order
+// holds in both modes, which a test checks.
+export const chartByHue = [14, 8, 2, 4, 10, 6, 3, 12, 1, 15, 7, 13, 9, 16, 11, 5];
 
 // Magnitude (sequential, one hue, faint to strong) and change (diverging: blue
 // for a fall, a grey midpoint for none, red for a rise), as data.xfina.dev's

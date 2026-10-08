@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- **`ColorPicker`:** a theme colour picked from a swatch, for Labs' Allocation table and any site that lets a reader colour an item. A swatch button opens a 4×4 grid of the sixteen chart colours, grouped by hue (reds to yellow, greens to sky, blues to violets, purples to pinks) so a reader finds the colour they want; charts still assign them in slot order; `v-model` is the token name, so the colour follows light and dark. The chosen colour has a check, and colours other items use (`used`) a dot, with who uses them in the tooltip and the swatch's name ("Colour 3, used by Gold"). The grid is a radiogroup with one tab stop: arrow keys move without recolouring anything behind the popover, Enter or Space picks, Escape closes. The marks are drawn in the popover's colours, so they read on every slot in both modes. `colors` offers another set, of any size, and `columns` sets the grid's width; by default it is as near a square as the set allows (⌈√n⌉ wide). A value outside the set, an undefined token, or a width that is not a whole number from 1, throws.
+- **Sixteen chart colours:** `chart-9` … `chart-16` follow the eight there were, which are unchanged, so Labs can colour a portfolio of more than eight assets. Validated in slot order on both surfaces: worst neighbouring pair CVD ΔE 9.1 light / 8.4 dark, normal-vision ΔE 19.6 / 17.3, and the new slots are all at 3:1 or more. Sixteen colours cannot all stay apart: past eight series some pairs that are not neighbours look alike (slots 11 and 16 are the closest), so a chart with more than eight names each series with labels or a table. `chart.series()` returns all sixteen.
+- **`Popover`:** shadcn-vue's, on reka-ui: `Popover`, `PopoverTrigger`, `PopoverContent`, `PopoverAnchor`.
+
 ## 0.6.1
 
 - **`XfinaFamily`:** a rule above "The Xfina family", in the border colour. Sites place the family at the foot of every page, straight after their own content, and without a rule it read as more of that page.

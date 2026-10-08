@@ -75,11 +75,12 @@ import { XfinaProvider, XfinaHeader, Button, Card, CardHeader, CardTitle, CardCo
 
 ### Components
 
-shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, Input, Label, Select, Table, Tooltip**, with the same parts and props as shadcn. Also:
+shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, Input, Label, Popover, Select, Table, Tooltip**, with the same parts and props as shadcn. Also:
 
 | | |
 |---|---|
 | `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
+| `ColorPicker` | A theme colour picked from a swatch, such as each asset's colour in a table. `v-model` is a token name (`'chart-3'`); `colors` the token names on offer (default every chart slot, shown in rows around the colour wheel: reds to yellow, greens to sky, blues to violets, purples to pinks); `used` maps a token to who already uses it (`{ 'chart-1': 'Nifty 50' }`, leaving out the item's own), marked with a dot and named in its tooltip and accessible name ("Colour 3, used by Gold", numbered by place in the picker); `label` names what is coloured ("Colour for Gold"). Any number of colours; `columns` sets the grid's width, and by default it is as near a square as the set allows (⌈√n⌉ wide, so the 16 chart slots are 4×4 and 8 colours 3×3 with a gap). Arrow keys move, Enter or Space picks, Escape closes. A value outside `colors`, a token that is not defined, or a `columns` that is not a whole number from 1, throws |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
 | `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
@@ -107,7 +108,7 @@ One card per member of the family, as xsteer.in shows its projects; pass `site` 
 | | |
 |---|---|
 | `useXfinaTheme()` | `{ isDark, toggle }`. The choice is a cookie on xfina.dev, so it holds on every subdomain |
-| `chart.series()` | The eight series colours as `rgb()`, in the order they are assigned |
+| `chart.series()` | The sixteen series colours as `rgb()`, in the order they are assigned |
 | `chart.ramp("seq" \| "div")` | Five steps for magnitude, or for change (fall, none, rise) |
 | `chart.echarts()` | `{ color, textStyle, legend, tooltip, axis }` to spread into an ECharts option |
 
@@ -118,7 +119,7 @@ Read chart colours at draw time and again on the `themechange` window event.
 Colours are HSL triplets, used through the preset (`bg-primary`, `text-muted-foreground`, `bg-chart-1`, `text-status-warning-text`, with opacity such as `bg-primary/10`) or directly as `hsl(var(--name))`.
 
 - **Interface:** shadcn zinc, except `primary`, which is the brand blue from the logo (white text in both modes). Blue used as text takes `primary-text`, which stays readable on the dark surface.
-- **Charts:** `chart-1` … `chart-8`. Assign them in order: the order keeps neighbouring series apart for colour-blind readers.
+- **Charts:** `chart-1` … `chart-16`. Assign them in order: the order keeps neighbouring series apart for colour-blind readers. Past eight series, some that are not neighbours look alike (no sixteen colours all stay apart), so a chart with more than eight names every series with a legend and direct labels or a table, never by colour alone. `ColorPicker` shows them grouped by hue instead, so a reader finds the colour they want; a site still gives its items their defaults in slot order, and the picker is for a reader choosing another.
 - **Ramps:** `seq-1..5` for magnitude, `div-1..5` for change.
 - **Status:** `status-good`, `-warning`, `-serious`, `-critical`, each with a `-text` step for text. They mark a state, never a series.
 

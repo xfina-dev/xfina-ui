@@ -4,7 +4,7 @@
 
 import { test } from "vitest";
 import assert from "node:assert/strict";
-import { colours, constants } from "../src/tokens.js";
+import { chartByHue, chartSlots, colours, constants } from "../src/tokens.js";
 import { triplet } from "../scripts/colour.mjs";
 
 // The inverse of triplet(), so a hex token can be checked against its output.
@@ -47,10 +47,35 @@ test("every colour is a hex or an HSL triplet", () => {
   }
 });
 
-test("the chart palette keeps its eight slots in order", () => {
+test("the chart palette keeps its sixteen slots in order", () => {
   for (const tokens of [colours.light, colours.dark]) {
     const slots = Object.keys(tokens).filter((name) => name.startsWith("chart-"));
-    assert.deepEqual(slots, ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5", "chart-6", "chart-7", "chart-8"]);
+    assert.deepEqual(slots, Array.from({ length: 16 }, (_, i) => `chart-${i + 1}`));
+  }
+  assert.equal(chartSlots, 16);
+});
+
+test("the picker's hue order is every slot once, around the colour wheel in both modes", () => {
+  assert.deepEqual([...chartByHue].sort((a, b) => a - b), Array.from({ length: chartSlots }, (_, i) => i + 1));
+  // OKLCH hue, from sRGB through OKLab.
+  const hue = (hex) => {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+    const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+    return ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360;
+  };
+  for (const mode of ["light", "dark"]) {
+    const hues = chartByHue.map((n) => hue(colours[mode][`chart-${n}`]));
+    // Once around the wheel: going round the list, the hue falls back exactly
+    // once (where it passes 360°), however each mode places the start.
+    const falls = hues.filter((h, i) => hues[(i + 1) % hues.length] < h).length;
+    assert.equal(falls, 1, `${mode}: ${hues.map((h) => h.toFixed(0)).join(" ")}`);
   }
 });
 

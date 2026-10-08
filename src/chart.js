@@ -3,6 +3,8 @@
 // browser resolves each token to rgb() through a probe. Read them at draw
 // time, and again on `themechange`: the values differ between light and dark.
 
+import { chartSlots } from "./tokens.js";
+
 let probe;
 
 export function colour(token) {
@@ -21,7 +23,7 @@ export function colour(token) {
 const steps = (prefix, count) => Array.from({ length: count }, (_, i) => colour(`--${prefix}-${i + 1}`));
 
 // Series colours, in the order they must be assigned.
-export const series = () => steps("chart", 8);
+export const series = () => steps("chart", chartSlots);
 
 // Five-step ramps: "seq" for magnitude, "div" for change (fall, none, rise).
 export const ramp = (name) => steps(name, 5);
