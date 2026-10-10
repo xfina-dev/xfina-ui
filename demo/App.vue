@@ -30,6 +30,12 @@ const assets = ref([
   { name: "Gold", color: "chart-3", weight: 20 },
   { name: "Bonds", color: "chart-4", weight: 10 },
 ]);
+// A long table in a fixed-height box, for the sticky header.
+const years = Array.from({ length: 30 }, (_, i) => {
+  const year = 2026 - i;
+  return { year, nifty: (8 + ((i * 7) % 13) - 3).toFixed(1), gold: (6 + ((i * 5) % 11) - 2).toFixed(1) };
+});
+
 const usedBy = (self) =>
   Object.fromEntries(
     [...new Set(assets.value.filter((a) => a !== self).map((a) => a.color))].map((c) => [
@@ -236,6 +242,27 @@ watch(site, () => setTimeout(resize));
             <p class="text-muted-foreground">shadcn's Popover, from xfina-ui.</p>
           </PopoverContent>
         </Popover>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">Scrolling table</h2>
+        <p class="text-sm text-muted-foreground">
+          <code>container-class="h-full"</code> gives the scrolling wrapper the box's height, so a <code>sticky top-0</code> header stays put.
+        </p>
+        <Card class="h-72 overflow-hidden">
+          <Table container-class="h-full">
+            <TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">
+              <TableRow><TableHead>Year</TableHead><TableHead class="text-right">Nifty 50 %</TableHead><TableHead class="text-right">Gold %</TableHead></TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="y in years" :key="y.year">
+                <TableCell class="tabular-nums">{{ y.year }}</TableCell>
+                <TableCell class="text-right tabular-nums">{{ y.nifty }}</TableCell>
+                <TableCell class="text-right tabular-nums">{{ y.gold }}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Card>
       </section>
 
       <Accordion type="single" collapsible class="w-full">

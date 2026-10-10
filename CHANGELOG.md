@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1
+
+- **`Table`:** `container-class` styles the scrolling wrapper around the `<table>`, which `class` could not reach. In a fixed-height box the wrapper grew to the whole table and never scrolled, so a `sticky top-0` header scrolled away with the rows (Labs measured a 12,662px wrapper in a 343px box). `<Table container-class="h-full">` gives the wrapper the box's height, and the header stays put. The demo has a long table with a sticky header.
+- **`ColorPicker`:** a chart colour is announced by its slot, wherever the hue grouping puts it: `chart-1` is "Colour 1", not "Colour 9" (its place in the grid). Numbering by place contradicted the token and "assign colours in slot order". Tokens other than the chart slots are still numbered by their place in `colors`.
+
 ## 0.7.0
 
 - **`ColorPicker`:** a theme colour picked from a swatch, for Labs' Allocation table and any site that lets a reader colour an item. A swatch button opens a 4×4 grid of the sixteen chart colours, grouped by hue (reds to yellow, greens to sky, blues to violets, purples to pinks) so a reader finds the colour they want; charts still assign them in slot order; `v-model` is the token name, so the colour follows light and dark. The chosen colour has a check, and colours other items use (`used`) a dot, with who uses them in the tooltip and the swatch's name ("Colour 3, used by Gold"). The grid is a radiogroup with one tab stop: arrow keys move without recolouring anything behind the popover, Enter or Space picks, Escape closes. The marks are drawn in the popover's colours, so they read on every slot in both modes. `colors` offers another set, of any size, and `columns` sets the grid's width; by default it is as near a square as the set allows (⌈√n⌉ wide). A value outside the set, an undefined token, or a width that is not a whole number from 1, throws.
