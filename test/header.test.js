@@ -144,7 +144,8 @@ describe("Segmented", () => {
     const [one, five] = wrapper.findAll("button");
     expect(five.attributes("aria-pressed")).toBe("true");
     expect(one.attributes("aria-pressed")).toBe("false");
-    // A filled primary is a near-white block in dark mode.
+    // The default variant marks a choice as `selected` does, an outline on a
+    // tint; only variant="primary" fills it.
     expect(five.classes()).not.toContain("bg-primary");
     expect(five.classes()).toContain("bg-primary/5");
     // The end buttons follow the group's rounded inside corner, so a chosen

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+- **`Segmented`:** `size` (`sm`, `default`, `lg`) and `variant` (`default`, `primary`). Each size is as tall overall as the Button it lines up with: 32px, 36px (Button `sm`) and 44px (Button `lg`). `variant="primary"` fills the chosen option as a default Button, inside a padded group, for a switch that changes everything below it and must stand out as much as the page's main button: Labs' Nominal | Real, which Labs had built by hand from Buttons. The defaults draw exactly what 0.7 drew. An unknown size or variant throws.
+
 ## 0.7.1
 
 - **`Table`:** `container-class` styles the scrolling wrapper around the `<table>`, which `class` could not reach. In a fixed-height box the wrapper grew to the whole table and never scrolled, so a `sticky top-0` header scrolled away with the rows (Labs measured a 12,662px wrapper in a 343px box). `<Table container-class="h-full">` gives the wrapper the box's height, and the header stays put. The demo has a long table with a sticky header.

@@ -47,6 +47,10 @@ describe("the Tailwind preset", () => {
       ".border-popover",
       ".bg-popover-foreground",
       ".ring-offset-popover",
+      // Segmented's sizes, which are arbitrary values.
+      ".h-\\[30px\\]",
+      ".h-\\[42px\\]",
+      ".p-\\[3px\\]",
     ]) {
       expect(css, cls).toContain(cls);
     }

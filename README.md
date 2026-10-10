@@ -84,7 +84,7 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `Table container-class` | Classes for the table's scrolling wrapper, which `class` (on the `<table>`) cannot reach. For a table that scrolls inside a fixed-height box with its header in view: `<Table container-class="h-full">` (or `max-h-96`) and `<TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">`. The inset shadow is the header's rule: a row's border does not stick with it |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
-| `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
+| `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. `size`: `sm`, `default` or `lg`, as tall overall as the Button it lines up with (32, 36 and 44px). `variant`: `default` draws the chosen one as `selected` is, for a filter among controls; `primary` fills it as a default Button, for a switch that changes everything below it (`<Segmented v-model="unit" :options="['Nominal', 'Real']" size="lg" variant="primary" />`). An unknown size or variant throws |
 | `cn()` | shadcn's class merger, for composing classes |
 
 ### `XfinaHeader`

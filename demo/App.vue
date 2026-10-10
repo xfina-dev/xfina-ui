@@ -22,6 +22,8 @@ const app = ref("portfolio");
 const version = ref("0.8");
 const period = ref("5Y");
 const added = ref(true);
+const unit = ref("Nominal");
+const size = ref("5Y");
 
 // Labs' Allocation table: each asset picks its colour, defaults in slot order.
 const assets = ref([
@@ -161,6 +163,26 @@ watch(site, () => setTimeout(resize));
           <Badge variant="warning">Design mock</Badge>
           <Badge variant="critical">Invalid</Badge>
           <Badge variant="soon">Not published yet</Badge>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">Segmented sizes and variants</h2>
+        <p class="text-sm text-muted-foreground">
+          Each size is as tall as the Button beside it. <code>variant="primary"</code> fills the choice, for a switch that changes everything below it.
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <Segmented v-model="size" size="sm" label="Period, small" :options="['1Y', '5Y', 'All']" />
+          <Segmented v-model="size" label="Period" :options="['1Y', '5Y', 'All']" />
+          <Segmented v-model="size" size="lg" label="Period, large" :options="['1Y', '5Y', 'All']" />
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <Segmented v-model="unit" size="sm" variant="primary" label="Units, small" :options="['Nominal', 'Real']" />
+          <Segmented v-model="unit" variant="primary" label="Units" :options="['Nominal', 'Real']" />
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <Segmented v-model="unit" size="lg" variant="primary" label="Units for every figure in Results" :options="['Nominal', 'Real', { value: 'PPP', label: 'PPP' }]" :disabled="['PPP']" />
+          <Button size="lg">Run backtest</Button>
         </div>
       </section>
 
