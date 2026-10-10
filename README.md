@@ -85,7 +85,7 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `FeedbackCard` | How a tool went, after its results, then the way forward that fits the answer. See [Feedback card](#feedback-card) |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
-| `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
+| `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. `size`: `default` is 36px overall, level with a Button `size="sm"`; `lg` is 44px, level with a Button `size="lg"`; `sm` is a compact 32px of its own. `variant`: `default` draws the chosen one as `selected` is, for a filter among controls; `primary` fills it as a default Button, for a switch that changes everything below it (`<Segmented v-model="unit" :options="['Nominal', 'Real']" size="lg" variant="primary" />`). An unknown size or variant throws |
 | `cn()` | shadcn's class merger, for composing classes |
 
 ### Feedback card
