@@ -66,9 +66,13 @@ onMounted(() => {
 });
 
 const swatch = (c) => ({ background: `hsl(var(--${c}))` });
-const name = (i) => `Colour ${i + 1}`;
-const spoken = (c, i) => (props.used[c] ? `${name(i)}, used by ${props.used[c]}` : name(i));
-const current = computed(() => (selected.value < 0 ? "none" : name(selected.value)));
+// A chart slot is named by its number wherever the grid puts it: shown by
+// hue, chart-1 sits ninth, and "Colour 9" for chart-1 contradicted the token
+// and "assign colours in slot order". Other tokens have no number of their
+// own, so they are numbered by their place in `colors`.
+const name = (c, i) => `Colour ${/^chart-(\d+)$/.exec(c)?.[1] ?? i + 1}`;
+const spoken = (c, i) => (props.used[c] ? `${name(c, i)}, used by ${props.used[c]}` : name(c, i));
+const current = computed(() => (selected.value < 0 ? "none" : name(props.modelValue, selected.value)));
 
 // Zero or a fraction makes no grid at all, and the arrows would go nowhere.
 function checkColumns(n) {

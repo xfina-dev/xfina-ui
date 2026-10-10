@@ -50,8 +50,8 @@ async function key(name) {
 describe("ColorPicker", () => {
   test("the trigger names what it colours and the colour chosen", () => {
     const { trigger } = picker();
-    // Named by where it sits in the picker: chart-3 is the seventh swatch.
-    expect(trigger().attributes("aria-label")).toBe("Colour for Gold: Colour 7");
+    // Named by its slot, though the picker shows it seventh.
+    expect(trigger().attributes("aria-label")).toBe("Colour for Gold: Colour 3");
     expect(trigger().find("span").attributes("style")).toContain("var(--chart-3)");
   });
 
@@ -61,7 +61,8 @@ describe("ColorPicker", () => {
     expect(group().getAttribute("aria-label")).toBe("Colour for Gold");
     expect(swatches().map((s) => s.dataset.color)).toEqual(BY_HUE);
     expect([...BY_HUE].sort()).toEqual([...CHART].sort());
-    expect(swatches().map((s) => s.getAttribute("aria-label"))).toEqual(BY_HUE.map((_, i) => `Colour ${i + 1}`));
+    // Each named by its slot, wherever the hue grouping puts it.
+    expect(swatches().map((s) => s.getAttribute("aria-label"))).toEqual(chartByHue.map((n) => `Colour ${n}`));
     const checked = swatches().filter((s) => s.getAttribute("aria-checked") === "true");
     expect(checked.map((s) => s.dataset.color)).toEqual(["chart-3"]);
     expect(checked[0].querySelector("svg")).not.toBeNull();
@@ -73,7 +74,7 @@ describe("ColorPicker", () => {
     await open(trigger);
     const marked = swatches().filter((s) => s.querySelector("[data-used]"));
     expect(marked.map((s) => s.dataset.color)).toEqual(["chart-6", "chart-1"]);
-    expect(swatches()[8].getAttribute("aria-label")).toBe("Colour 9, used by Nifty 50");
+    expect(swatches()[8].getAttribute("aria-label")).toBe("Colour 1, used by Nifty 50");
     expect(swatches()[5].getAttribute("aria-label")).toBe("Colour 6, used by Nasdaq 100, Bonds");
   });
 
@@ -84,7 +85,7 @@ describe("ColorPicker", () => {
     await flushPromises();
     expect(value.value).toBe("chart-14");
     expect(group()).toBeNull();
-    expect(trigger().attributes("aria-label")).toBe("Colour for Gold: Colour 1");
+    expect(trigger().attributes("aria-label")).toBe("Colour for Gold: Colour 14");
   });
 
   test("the grid is as near a square as the set allows", async () => {
@@ -181,9 +182,11 @@ describe("ColorPicker", () => {
 
   test("offers another set when given one", async () => {
     for (const c of ["seq-1", "seq-2", "seq-3"]) document.documentElement.style.setProperty(`--${c}`, "#000000");
-    const { trigger } = picker({ colors: ["seq-1", "seq-2", "seq-3"], modelValue: "seq-2" });
+    const { trigger } = picker({ colors: ["seq-3", "seq-1", "seq-2"], modelValue: "seq-1" });
     await open(trigger);
-    expect(swatches().map((s) => s.dataset.color)).toEqual(["seq-1", "seq-2", "seq-3"]);
+    expect(swatches().map((s) => s.dataset.color)).toEqual(["seq-3", "seq-1", "seq-2"]);
+    // Tokens other than the chart slots are numbered by their place.
+    expect(swatches().map((s) => s.getAttribute("aria-label"))).toEqual(["Colour 1", "Colour 2", "Colour 3"]);
     expect(trigger().attributes("aria-label")).toBe("Colour for Gold: Colour 2");
   });
 

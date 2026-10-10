@@ -1,6 +1,6 @@
 {
   "name": "xfina-ui",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "The theme and UI components of the xfina.dev sites: a Tailwind preset, light/dark, the shared header and shadcn-vue components.",
   "license": "Apache-2.0",
   "type": "module",
