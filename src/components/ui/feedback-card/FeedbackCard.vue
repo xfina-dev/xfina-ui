@@ -6,7 +6,7 @@
 // repository's GitHub issue forms with the tool and page filled in; nothing is
 // sent from here. The answer is remembered in this browser, so it is not asked
 // on every visit, and never leaves it.
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { Bug, Check, Lightbulb, MessageSquareHeart, Share2, Star, ThumbsDown, ThumbsUp } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,7 +57,11 @@ const read = () => {
     return null;
   }
 };
-const answer = ref(read()); // 'up' | 'down' | null
+// Unanswered until mounted, as a static render (vite-ssg) has no storage: a
+// remembered answer read during setup would differ from the server's HTML, and
+// production hydration does not patch class or aria-pressed, so the card would
+// show one answer selected while holding another.
+const answer = ref(null); // 'up' | 'down' | null
 // The answer stays shown as selected: the other button switches it, the same
 // one again clears it.
 function choose(choice) {
@@ -72,13 +76,22 @@ function choose(choice) {
 
 const page = () => `${location.origin}${location.pathname}`;
 
+// The page and browser a problem report carries. A static render has no
+// location or navigator, so they are filled in once mounted, and the server's
+// links match the first client render's.
+const environment = ref(null);
+onMounted(() => {
+  environment.value = `Page: ${page()}\nBrowser: ${navigator.userAgent}`;
+  answer.value = read();
+});
+
 // A new issue from one of the repository's forms. GitHub fills a form's field
 // from the query parameter named by its id, so `tool` and `environment` must
 // match the forms' ids. Tool is required on every form, so a product without
 // tools fills it with its own name.
 function issue(template) {
   const query = new URLSearchParams({ template: `${templates[template]}.yml`, tool: subject.value });
-  if (template === "problem") query.set("environment", `Page: ${page()}\nBrowser: ${navigator.userAgent}`);
+  if (template === "problem" && environment.value) query.set("environment", environment.value);
   return `${props.repo}/issues/new?${query}`;
 }
 const links = computed(() => ({ problem: issue("problem"), idea: issue("idea"), story: issue("story") }));

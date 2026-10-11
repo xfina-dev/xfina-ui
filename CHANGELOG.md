@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+
+- **`FeedbackCard`:** renders on the server, for data.xfina.dev's static pages (vite-ssg). The problem report's page and browser were read during render, and Node has no `location`, so the render threw. They are now filled in once the card is mounted. A remembered answer is also read once mounted, not during setup: the server has no storage and renders the card unanswered, and production hydration keeps the server's class and `aria-pressed`, so a reader who had answered saw the card unanswered while it held their answer. A site can drop the `<ClientOnly>` it wrapped the card in.
+
 ## 0.8.0
 
 - **`FeedbackCard`:** Labs' feedback card, for every site, so data.xfina.dev asks the same way after its results. "How was it?" with Useful and Could be better, then the way forward that fits the answer: a star, a share and "tell us what you used it for", or a problem report and a feature request. The answer stays shown as selected; the other button switches it and the same one clears it. Each link opens one of the site repository's issue forms with the tool (and, for a problem, the page and browser) filled in. The answer is kept in localStorage under the site's `storage-key` and never sent. `nudge` sets the one-line lead-in above the card. A `repo` that is not a GitHub repository URL, or an unknown `templates` key, throws. The issue forms the links expect are in `issue-templates/`, for each site's repository to copy.

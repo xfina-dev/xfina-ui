@@ -3,6 +3,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { createSSRApp, h, nextTick } from "vue";
+import { renderToString } from "vue/server-renderer";
 import { mount, flushPromises } from "@vue/test-utils";
 import { FeedbackCard } from "@/index.js";
 
@@ -81,11 +83,41 @@ describe("FeedbackCard", () => {
     expect(localStorage.getItem(KEY)).toBeNull();
   });
 
-  test("a remembered answer is shown on the next visit; anything else is not an answer", () => {
+  test("a remembered answer is shown once mounted; anything else is not an answer", async () => {
     localStorage.setItem(KEY, "down");
-    expect(pressed(card())).toEqual(["false", "true"]);
+    const wrapper = card();
+    await nextTick();
+    expect(pressed(wrapper)).toEqual(["false", "true"]);
+    expect(wrapper.text()).toContain("Report a problem");
     localStorage.setItem(KEY, "maybe");
-    expect(pressed(card())).toEqual(["false", "false"]);
+    const other = card();
+    await nextTick();
+    expect(pressed(other)).toEqual(["false", "false"]);
+  });
+
+  // vite-ssg renders the page in Node, with no storage, and the browser
+  // hydrates it. Production hydration keeps the server's class and
+  // aria-pressed, so the first client render must match the server's.
+  test("a static render hydrates without a mismatch, then shows the remembered answer", async () => {
+    localStorage.setItem(KEY, "up");
+    const app = () => createSSRApp({ render: () => h(FeedbackCard, LABS) });
+    const html = await renderToString(app());
+    expect(html).toContain('aria-pressed="false"');
+    expect(html).not.toContain('aria-pressed="true"');
+    const root = document.createElement("div");
+    root.innerHTML = html;
+    document.body.append(root);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const mounted = app();
+    mounted.mount(root);
+    await nextTick();
+    expect([...warn.mock.calls, ...error.mock.calls].flat().join("\n")).not.toMatch(/hydration/i);
+    const buttons = root.querySelectorAll('[role="group"] button');
+    expect([...buttons].map((b) => b.getAttribute("aria-pressed"))).toEqual(["true", "false"]);
+    expect(root.textContent).toContain("Star on GitHub");
+    mounted.unmount();
+    root.remove();
   });
 
   test("blocked storage still answers, for this visit", async () => {
@@ -102,6 +134,7 @@ describe("FeedbackCard", () => {
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     localStorage.setItem(KEY, "up");
     const wrapper = card();
+    await nextTick();
     const share = wrapper.findAll("button").find((b) => b.text() === "Share");
     await share.trigger("click");
     await flushPromises();
@@ -117,6 +150,7 @@ describe("FeedbackCard", () => {
     Object.defineProperty(navigator, "share", { configurable: true, value: share });
     localStorage.setItem(KEY, "up");
     const wrapper = card();
+    await nextTick();
     await wrapper.findAll("button").find((b) => b.text() === "Share").trigger("click");
     expect(share).toHaveBeenCalledWith({ title: "Portfolio Engine · Xfina Labs", url: `${location.origin}${location.pathname}` });
   });
