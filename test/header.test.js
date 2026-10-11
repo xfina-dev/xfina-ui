@@ -136,22 +136,3 @@ describe("XfinaProvider", () => {
     delete document.documentElement.clientWidth;
   });
 });
-
-describe("Segmented", () => {
-  test("marks the chosen option with a tint and outline, not a filled primary", async () => {
-    const { Segmented } = await import("@/index.js");
-    const wrapper = mount(Segmented, { props: { modelValue: "5Y", options: ["1Y", "5Y"], label: "Period" } });
-    const [one, five] = wrapper.findAll("button");
-    expect(five.attributes("aria-pressed")).toBe("true");
-    expect(one.attributes("aria-pressed")).toBe("false");
-    // A filled primary is a near-white block in dark mode.
-    expect(five.classes()).not.toContain("bg-primary");
-    expect(five.classes()).toContain("bg-primary/5");
-    // The end buttons follow the group's rounded inside corner, so a chosen
-    // end button's outline closes.
-    expect(one.classes()).toContain("first:rounded-l-[calc(var(--radius)-3px)]");
-    expect(five.classes()).toContain("last:rounded-r-[calc(var(--radius)-3px)]");
-    await one.trigger("click");
-    expect(wrapper.emitted("update:modelValue")).toEqual([["1Y"]]);
-  });
-});

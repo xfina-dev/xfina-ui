@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+
+- **`Segmented`:** `size` (`sm`, `default`, `lg`) and `variant` (`default`, `primary`). `default` is 36px overall, as tall as a Button `size="sm"`; `lg` is 44px, as tall as a Button `size="lg"`, so the two line up in one row; `sm` is a compact 32px of its own. `variant="primary"` fills the chosen option as a default Button, inside a padded group, for a switch that changes everything below it and must stand out as much as the page's main button: Labs' Nominal | Real, which Labs had built by hand from Buttons. With neither prop, Segmented looks as it did. An unknown size or variant throws.
+
 ## 0.8.1
 
 - **`FeedbackCard`:** renders on the server, for data.xfina.dev's static pages (vite-ssg). The problem report's page and browser were read during render, and Node has no `location`, so the render threw. They are now filled in once the card is mounted. A remembered answer is also read once mounted, not during setup: the server has no storage and renders the card unanswered, and production hydration keeps the server's class and `aria-pressed`, so a reader who had answered saw the card unanswered while it held their answer. A site can drop the `<ClientOnly>` it wrapped the card in.
