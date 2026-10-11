@@ -11,6 +11,7 @@ export * from "./components/ui/card";
 export * from "./components/ui/color-picker";
 export * from "./components/ui/copy-field";
 export * from "./components/ui/dialog";
+export * from "./components/ui/feedback-card";
 export * from "./components/ui/input";
 export * from "./components/ui/label";
 export * from "./components/ui/popover";

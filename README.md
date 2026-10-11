@@ -82,10 +82,36 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
 | `ColorPicker` | A theme colour picked from a swatch, such as each asset's colour in a table. `v-model` is a token name (`'chart-3'`); `colors` the token names on offer (default every chart slot, shown in rows around the colour wheel: reds to yellow, greens to sky, blues to violets, purples to pinks); `used` maps a token to who already uses it (`{ 'chart-1': 'Nifty 50' }`, leaving out the item's own), marked with a dot and named in its tooltip and accessible name ("Colour 3, used by Gold": a chart slot by its number, wherever the grid shows it; other tokens by their place in `colors`); `label` names what is coloured ("Colour for Gold"). Any number of colours; `columns` sets the grid's width, and by default it is as near a square as the set allows (⌈√n⌉ wide, so the 16 chart slots are 4×4 and 8 colours 3×3 with a gap). Arrow keys move, Enter or Space picks, Escape closes. A value outside `colors`, a token that is not defined, or a `columns` that is not a whole number from 1, throws |
 | `Table container-class` | Classes for the table's scrolling wrapper, which `class` (on the `<table>`) cannot reach. For a table that scrolls inside a fixed-height box with its header in view: `<Table container-class="h-full">` (or `max-h-96`) and `<TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">`. The inset shadow is the header's rule: a row's border does not stick with it |
+| `FeedbackCard` | How a tool went, after its results, then the way forward that fits the answer. See [Feedback card](#feedback-card) |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
 | `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. The chosen one is drawn as `selected` is |
 | `cn()` | shadcn's class merger, for composing classes |
+
+### Feedback card
+
+```vue
+<FeedbackCard
+  product="Xfina Labs"
+  tool="Portfolio Engine"
+  repo="https://github.com/xfina-dev/xfina-labs"
+  storage-key="xfina_labs_feedback_portfolio-engine"
+  nudge="Found this useful? A minute of feedback shapes what we build next."
+/>
+```
+
+The title is "Xfina Labs / Portfolio Engine · Feedback" ("Xfina Data · Feedback" without a `tool`), and the line under it carries the conversation. **Useful** offers a star on GitHub, a share (the share sheet where there is one, otherwise the page's link copied) and "Tell us what you used it for"; **Could be better** offers a problem report and a feature request. The chosen answer stays shown as selected: the other button switches it, the same one again clears it. A footer links all of them at any time, except after Could be better, whose buttons already do.
+
+| | |
+|---|---|
+| `product` | Required: who the feedback goes to |
+| `tool` | What was used, if the product has several. Fills each issue form's Tool field (the product, without it) |
+| `repo` | Required: `https://github.com/<owner>/<name>`, where the issues open. Anything else throws |
+| `storage-key` | Required: the localStorage key the answer is kept under, one per tool. The answer never leaves the browser; nothing is sent and nothing is counted |
+| `templates` | The issue forms' file names without `.yml`, if a repository names them otherwise: `{ problem, idea, story }`, each defaulting to its key. An unknown key throws |
+| `nudge` | A one-line lead-in, centred between two rules above the card |
+
+The links open `<repo>/issues/new?template=<name>.yml&tool=<tool>`, and the problem link adds `environment` with the page and browser. **The site's repository needs the three issue forms** in `.github/ISSUE_TEMPLATE/`, with the field ids those parameters fill: copy [`issue-templates/`](issue-templates/) (`problem.yml`, `idea.yml`, `story.yml`, and `config.yml`, which keeps blank issues open) and change only their wording and placeholders. Without them GitHub opens a blank issue and the tool and page are lost.
 
 ### `XfinaHeader`
 

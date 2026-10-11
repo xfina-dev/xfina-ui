@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+- **`FeedbackCard`:** Labs' feedback card, for every site, so data.xfina.dev asks the same way after its results. "How was it?" with Useful and Could be better, then the way forward that fits the answer: a star, a share and "tell us what you used it for", or a problem report and a feature request. The answer stays shown as selected; the other button switches it and the same one clears it. Each link opens one of the site repository's issue forms with the tool (and, for a problem, the page and browser) filled in. The answer is kept in localStorage under the site's `storage-key` and never sent. `nudge` sets the one-line lead-in above the card. A `repo` that is not a GitHub repository URL, or an unknown `templates` key, throws. The issue forms the links expect are in `issue-templates/`, for each site's repository to copy.
+
 ## 0.7.1
 
 - **`Table`:** `container-class` styles the scrolling wrapper around the `<table>`, which `class` could not reach. In a fixed-height box the wrapper grew to the whole table and never scrolled, so a `sticky top-0` header scrolled away with the rows (Labs measured a 12,662px wrapper in a 343px box). `<Table container-class="h-full">` gives the wrapper the box's height, and the header stays put. The demo has a long table with a sticky header.

@@ -6,7 +6,7 @@ import * as echarts from "echarts";
 import { Check } from "lucide-vue-next";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
-  Badge, Button, ColorPicker, CopyField,
+  Badge, Button, ColorPicker, CopyField, FeedbackCard,
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
   Input, Label, Popover, PopoverContent, PopoverTrigger, Segmented,
@@ -22,6 +22,18 @@ const app = ref("portfolio");
 const version = ref("0.8");
 const period = ref("5Y");
 const added = ref(true);
+// The feedback cards open in their three states on every load: unanswered,
+// Useful and Could be better. Each remembers its answer under its own key.
+const FEEDBACK = { none: null, up: "up", down: "down" };
+for (const [state, answer] of Object.entries(FEEDBACK)) {
+  try {
+    const key = `xfina_ui_demo_feedback_${state}`;
+    if (answer) localStorage.setItem(key, answer);
+    else localStorage.removeItem(key);
+  } catch {
+    /* the cards then open unanswered */
+  }
+}
 
 // Labs' Allocation table: each asset picks its colour, defaults in slot order.
 const assets = ref([
@@ -263,6 +275,18 @@ watch(site, () => setTimeout(resize));
             </TableBody>
           </Table>
         </Card>
+      </section>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">Feedback card</h2>
+        <p class="text-sm text-muted-foreground">
+          <code>FeedbackCard</code> after a tool's results: unanswered (with its <code>nudge</code>), Useful, and Could be better (a product without a tool). Every link opens the repository's issue forms.
+        </p>
+        <div class="space-y-6">
+          <FeedbackCard product="Xfina Labs" tool="Portfolio Engine" repo="https://github.com/xfina-dev/xfina-labs" storage-key="xfina_ui_demo_feedback_none" nudge="Found this useful? A minute of feedback shapes what we build next." />
+          <FeedbackCard product="Xfina Labs" tool="Portfolio Engine" repo="https://github.com/xfina-dev/xfina-labs" storage-key="xfina_ui_demo_feedback_up" />
+          <FeedbackCard product="Xfina Data" repo="https://github.com/xfina-dev/xfina-data" storage-key="xfina_ui_demo_feedback_down" />
+        </div>
       </section>
 
       <Accordion type="single" collapsible class="w-full">
