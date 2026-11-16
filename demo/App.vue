@@ -11,6 +11,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
   Input, Label, Popover, PopoverContent, PopoverTrigger, Segmented,
   Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue,
+  SeriesExplorer,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   Tooltip, TooltipContent, TooltipTrigger,
   XfinaFamily, XfinaHeader, XfinaProvider, chart,
@@ -57,6 +58,40 @@ const usedBy = (self) =>
       assets.value.filter((a) => a !== self && a.color === c).map((a) => a.name).join(", "),
     ]),
   );
+
+// SeriesExplorer's two shapes of series: a daily price a site parsed (rows it
+// already holds, with events), and a monthly index a site fetched (a loader,
+// year-on-year, a value measured in points left to the rates dataset).
+const DAY = 864e5;
+const dailyTime = [];
+const dailyClose = [];
+const dailyAdj = [];
+for (let i = 0, value = 62; i < 12 * 365; i += 1) {
+  const time = Date.UTC(2015, 0, 1) + i * DAY;
+  const day = new Date(time).getUTCDay();
+  if (day === 0 || day === 6) continue; // a daily series has only trading days
+  value *= 1 + (Math.sin(i / 37) + Math.sin(i / 211) * 2.5) / 900;
+  dailyTime.push(time);
+  dailyClose.push(Number(value.toFixed(4)));
+  dailyAdj.push(Number((value * 0.985).toFixed(4)));
+}
+const daily = {
+  time: dailyTime,
+  values: { close: dailyClose, adjClose: dailyAdj },
+};
+const dailyEvents = [2016, 2019, 2022, 2025].map((year) => ({ time: `${year}-06-15`, label: `Dividend 0.25 (${year})` }));
+
+const monthlyTime = [];
+const monthlyIndex = [];
+for (let i = 0, value = 97.7; i < 12 * 14; i += 1) {
+  monthlyTime.push(Date.UTC(2012, i, 1));
+  value *= 1 + (4 + Math.sin(i / 9) * 3) / 1200;
+  monthlyIndex.push(Number(value.toFixed(2)));
+}
+// A loader, as a site that fetches its series passes one; it resolves to the
+// same rows a site holding them would pass in `rows`.
+const loadMonthly = () =>
+  new Promise((resolve) => setTimeout(() => resolve({ time: monthlyTime, values: { index: monthlyIndex } }), 400));
 
 const plot = ref(null);
 let instance;
@@ -317,6 +352,36 @@ watch(site, () => setTimeout(resize));
           <AccordionContent>shadcn's Accordion, from xfina-ui.</AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      <section class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">Series explorer</h2>
+        <p class="text-sm text-muted-foreground">
+          <code>SeriesExplorer</code> over rows a site already holds: a daily price with two lines, its dividends as events, and a table for
+          checking the values. Below it, a monthly index from a <code>loader</code>, with YoY.
+        </p>
+        <Card class="overflow-hidden">
+          <SeriesExplorer
+            :rows="daily"
+            :lines="[{ key: 'close', label: 'Close' }, { key: 'adjClose', label: 'Adj close' }]"
+            :views="['chart', 'calendar', 'table']"
+            :events="dailyEvents"
+            unit="INR per USD"
+            label="USD/INR"
+            note="A made-up series, for the gallery."
+          />
+        </Card>
+        <Card class="overflow-hidden">
+          <SeriesExplorer
+            :loader="loadMonthly"
+            :lines="[{ key: 'index', label: 'CPI' }]"
+            frequency="monthly"
+            year-on-year
+            unit="Index (2012 = 100)"
+            label="CPI"
+            note="A made-up series, for the gallery."
+          />
+        </Card>
+      </section>
 
       <section class="space-y-3">
         <h2 class="text-xl font-semibold tracking-tight">Chart theme</h2>

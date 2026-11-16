@@ -16,6 +16,9 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "vue",
+        // ECharts, which only SeriesExplorer imports, and only in the
+        // browser: the site installs it, so there is one copy of it.
+        /^echarts/,
         "reka-ui",
         "@vueuse/core",
         "class-variance-authority",

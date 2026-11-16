@@ -82,11 +82,48 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
 | `ColorPicker` | A theme colour picked from a swatch, such as each asset's colour in a table. `v-model` is a token name (`'chart-3'`); `colors` the token names on offer (default every chart slot, shown in rows around the colour wheel: reds to yellow, greens to sky, blues to violets, purples to pinks); `used` maps a token to who already uses it (`{ 'chart-1': 'Nifty 50' }`, leaving out the item's own), marked with a dot and named in its tooltip and accessible name ("Colour 3, used by Gold": a chart slot by its number, wherever the grid shows it; other tokens by their place in `colors`); `label` names what is coloured ("Colour for Gold"). Any number of colours; `columns` sets the grid's width, and by default it is as near a square as the set allows (⌈√n⌉ wide, so the 16 chart slots are 4×4 and 8 colours 3×3 with a gap). Arrow keys move, Enter or Space picks, Escape closes. A value outside `colors`, a token that is not defined, or a `columns` that is not a whole number from 1, throws |
 | `Table container-class` | Classes for the table's scrolling wrapper, which `class` (on the `<table>`) cannot reach. For a table that scrolls inside a fixed-height box with its header in view: `<Table container-class="h-full">` (or `max-h-96`) and `<TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">`. The inset shadow is the header's rule: a row's border does not stick with it |
+| `SeriesExplorer` | A time series browsed as a chart, a calendar or a table, with the period's change and CAGR. See [Series explorer](#series-explorer) |
 | `FeedbackCard` | How a tool went, after its results, then the way forward that fits the answer. See [Feedback card](#feedback-card) |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
 | `Segmented` | One choice of a few: `v-model`, `options` (strings or `{ value, label }`), `label`, `disabled`. `size`: `default` is 36px overall, level with a Button `size="sm"`; `lg` is 44px, level with a Button `size="lg"`; `sm` is a compact 32px of its own. `variant`: `default` draws the chosen one as `selected` is, for a filter among controls; `primary` fills it as a default Button, for a switch that changes everything below it (`<Segmented v-model="unit" :options="['Nominal', 'Real']" size="lg" variant="primary" />`). An unknown size or variant throws |
 | `cn()` | shadcn's class merger, for composing classes |
+
+### Series explorer
+
+```vue
+<SeriesExplorer
+  :rows="{ time: [/* epoch ms per row */], values: { close: [/* … */], adjClose: [/* … */] } }"
+  :lines="[{ key: 'close', label: 'Close' }, { key: 'adjClose', label: 'Adj close' }]"
+  :views="['chart', 'calendar', 'table']"
+  :events="[{ time: '2026-06-15', label: 'Dividend 0.25' }]"
+  frequency="daily"
+  unit="INR per USD"
+  label="USD/INR"
+/>
+```
+
+**It takes data, never a path.** Xfina Data passes the rows it parsed from a published CSV, Xfina the price history it parsed from a statement, and Labs a series out of WASM or IndexedDB; nothing here fetches, so all three use the same component. A site that does fetch gives a `loader` instead of `rows`, and the explorer shows "Loading…" and then the failure, if any, in place of drawing something wrong.
+
+One set of controls serves every view, and switching view keeps everything else as it was: **View** (when there is more than one), **Values** (Level, Change, and YoY where the series has it), **Period** (1Y, 5Y and 10Y, each offered only when the series is longer than it, and All), **From – to**, and the drag-to-choose slider under the view. The period's line (`2021-12-28 → 2026-12-28 · 5.0 years · 1,305 rows`) and a chip per line — from, to, change, and CAGR for a level — sit above it.
+
+| | |
+|---|---|
+| `rows` | The data: `{ time, values, text }`. `time` is epoch milliseconds per row; `values` is an array of numbers per line, in `lines` order, or an object keyed by each line's `key`; `text` (optional, same shape) is each value as its source wrote it, so `90.50` stays `90.50` in tooltips, cells and the table. A line with no values, or a column of the wrong length, throws |
+| `loader` | Or a function resolving to those rows, called on mount and again whenever it changes. Exactly one of `rows` and `loader`; neither or both throws |
+| `lines` | Required: `[{ key, label }]`. The first line is what the calendar colours and what change and CAGR are about |
+| `frequency` | `daily` (the default) or `monthly`; anything else throws. A monthly series counts a month from its first day, and draws its calendar as a month grid |
+| `change` | `percent` (the default) or `points`. A series that is itself a percentage, such as a policy rate, changes by the difference (`+1.75 pp`) and has no CAGR: compounding a rate's difference means nothing |
+| `views` | Any of `chart`, `calendar` and `table`; the default is chart and calendar, and the first is where the explorer opens. An unknown view throws |
+| `year-on-year` | Offers YoY beside Level and Change |
+| `events` | `[{ time, label }]`: dividends, splits, anything dated. Dashed rules on the chart, the words in the row's tooltip and in the table's Events column |
+| `first`, `last` | The period's bounds when a site knows them before the rows are in, as `YYYY-MM-DD`, `YYYY-MM` or epoch ms, so a static page renders its controls. Taken from the rows otherwise |
+| `sync-url` | Writes the view, the mode and the period into the query string (`?period=5y&view=calendar`), so a view can be shared. Off by default: a series held in the browser is not something a link can open |
+| `label` | Names the chart, the calendar and the table for a screen reader ("USD/INR, chart") |
+| `note` | Replaces the line under the view that says change and CAGR are computed in the browser. The rest of the note (what the calendar's colours and empty cells mean) follows the view |
+| `page-size` | Rows per page in the table view; 50 by default |
+
+**ECharts is a peer dependency** (`npm install echarts`), imported dynamically from a trimmed build — line, bar and heatmap charts, the calendar, slider, grid, legend, tooltip and visual map, on the canvas renderer. A page that mounts no explorer never loads it; one that does pays about 250 kB gzipped, in its own chunk. `rowsFromCsv(text, lines)` is exported beside the component for a site whose source is a CSV.
 
 ### Feedback card
 
