@@ -348,7 +348,7 @@ const controlLabel = "mb-1.5 block text-xs font-semibold uppercase tracking-wide
 
 <template>
   <div>
-    <div class="flex flex-wrap items-end gap-x-6 gap-y-3 px-6 max-sm:px-4" aria-label="Controls">
+    <div class="flex flex-wrap items-end gap-x-6 gap-y-3 px-6 pt-6 max-sm:px-4 max-sm:pt-4" aria-label="Controls">
       <div v-if="VIEWS.length > 1">
         <span :class="controlLabel">View</span>
         <Segmented v-model="viewModel" :options="VIEWS" label="View" />
