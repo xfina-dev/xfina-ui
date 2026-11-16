@@ -17,6 +17,7 @@ export * from "./components/ui/label";
 export * from "./components/ui/popover";
 export * from "./components/ui/segmented";
 export * from "./components/ui/select";
+export * from "./components/ui/series-explorer";
 export * from "./components/ui/table";
 export * from "./components/ui/tooltip";
 
