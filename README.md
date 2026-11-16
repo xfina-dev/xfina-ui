@@ -82,7 +82,7 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 | `Button variant="selected"` | The family's "chosen" state (an added item, a picked filter): a primary outline on a faint tint, never a filled primary, which glares in dark mode |
 | `ColorPicker` | A theme colour picked from a swatch, such as each asset's colour in a table. `v-model` is a token name (`'chart-3'`); `colors` the token names on offer (default every chart slot, shown in rows around the colour wheel: reds to yellow, greens to sky, blues to violets, purples to pinks); `used` maps a token to who already uses it (`{ 'chart-1': 'Nifty 50' }`, leaving out the item's own), marked with a dot and named in its tooltip and accessible name ("Colour 3, used by Gold": a chart slot by its number, wherever the grid shows it; other tokens by their place in `colors`); `label` names what is coloured ("Colour for Gold"). Any number of colours; `columns` sets the grid's width, and by default it is as near a square as the set allows (⌈√n⌉ wide, so the 16 chart slots are 4×4 and 8 colours 3×3 with a gap). Arrow keys move, Enter or Space picks, Escape closes. A value outside `colors`, a token that is not defined, or a `columns` that is not a whole number from 1, throws |
 | `Table container-class` | Classes for the table's scrolling wrapper, which `class` (on the `<table>`) cannot reach. For a table that scrolls inside a fixed-height box with its header in view: `<Table container-class="h-full">` (or `max-h-96`) and `<TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">`. The inset shadow is the header's rule: a row's border does not stick with it |
-| `SeriesExplorer` | A time series browsed as a chart, a calendar or a table, with the period's change and CAGR. See [Series explorer](#series-explorer) |
+| `SeriesExplorer` | A time series browsed as a chart, a calendar or a table, with the period's change and CAGR. Imported from `xfina-ui/series-explorer`, not from the package root. See [Series explorer](#series-explorer) |
 | `FeedbackCard` | How a tool went, after its results, then the way forward that fits the answer. See [Feedback card](#feedback-card) |
 | `CopyField` | A value joined to its copy button: `value`, optional `href` (makes the value a link), `label` (for "Copy URL"). One button width for "Copy" and "Copied"; a copy is confirmed with a check, as `selected` draws it |
 | `Badge` | `variant`: `default`, `good`, `warning`, `critical`, or `soon` (planned, dashed). Status text stays readable at 4.5:1 |
@@ -92,6 +92,13 @@ shadcn-vue's, on reka-ui, owned here once: **Accordion, Button, Card, Dialog, In
 ### Series explorer
 
 ```vue
+<script setup>
+// Its own entry point, and the one component that needs ECharts: a site that
+// never imports this subpath never has to resolve ECharts, and needs none
+// installed. Everything else comes from "xfina-ui" as before.
+import { SeriesExplorer } from "xfina-ui/series-explorer";
+</script>
+
 <SeriesExplorer
   :rows="{ time: [/* epoch ms per row */], values: { close: [/* … */], adjClose: [/* … */] } }"
   :lines="[{ key: 'close', label: 'Close' }, { key: 'adjClose', label: 'Adj close' }]"
@@ -123,7 +130,11 @@ One set of controls serves every view, and switching view keeps everything else 
 | `note` | Replaces the line under the view that says change and CAGR are computed in the browser. The rest of the note (what the calendar's colours and empty cells mean) follows the view |
 | `page-size` | Rows per page in the table view; 50 by default |
 
-**ECharts is a peer dependency** (`npm install echarts`), imported dynamically from a trimmed build — line, bar and heatmap charts, the calendar, slider, grid, legend, tooltip and visual map, on the canvas renderer. A page that mounts no explorer never loads it; one that does pays about 250 kB gzipped, in its own chunk. `rowsFromCsv(text, lines)` is exported beside the component for a site whose source is a CSV.
+**ECharts is an optional peer dependency** (`npm install echarts`), needed only by a site that imports `xfina-ui/series-explorer`. The explorer loads a trimmed build of it dynamically — line, bar and heatmap charts, the calendar, slider, grid, legend, tooltip and visual map, on the canvas renderer — so a page that mounts no explorer never fetches it, and one that does pays about 215 kB gzipped, in its own chunk.
+
+The subpath is what makes the peer dependency optional. The dynamic import defers the fetch, not the resolution: the ECharts module's own imports are static, so a bundler resolves `echarts/charts` and the rest while it builds whatever entry point reaches them. On the main barrel that was every site, and a site with no ECharts installed failed to build over a component it does not mount. On its own entry point it is only the sites that ask for it.
+
+`rowsFromCsv(text, lines)` is exported from the same subpath, for a site whose source is a CSV.
 
 ### Feedback card
 

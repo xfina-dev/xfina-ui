@@ -12,7 +12,11 @@ export default defineConfig({
   plugins: [vue()],
   resolve: { alias },
   build: {
-    lib: { entry: "src/index.js", formats: ["es"], fileName: "index" },
+    // Two entry points. SeriesExplorer is apart from the rest because it is
+    // the only component that imports ECharts: on the main barrel, its static
+    // `echarts/*` imports would be resolved by every consumer's bundler,
+    // including sites that have no ECharts installed and mount no explorer.
+    lib: { entry: { index: "src/index.js", "series-explorer": "src/series-explorer.js" }, formats: ["es"] },
     rollupOptions: {
       external: [
         "vue",

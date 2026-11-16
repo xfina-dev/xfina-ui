@@ -5,7 +5,7 @@
 
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
-import { SeriesExplorer } from "@/index.js";
+import { SeriesExplorer } from "@/series-explorer.js";
 
 const plots = [];
 vi.mock("@/components/ui/series-explorer/echarts.js", () => {

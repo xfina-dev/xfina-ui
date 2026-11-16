@@ -11,11 +11,12 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
   Input, Label, Popover, PopoverContent, PopoverTrigger, Segmented,
   Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue,
-  SeriesExplorer,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
   Tooltip, TooltipContent, TooltipTrigger,
   XfinaFamily, XfinaHeader, XfinaProvider, chart,
 } from "@/index.js";
+// The explorer is its own entry point, so a site without ECharts never names it.
+import { SeriesExplorer } from "@/series-explorer.js";
 
 const site = ref("data");
 const dataset = ref("bis-usd-inr");

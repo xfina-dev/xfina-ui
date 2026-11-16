@@ -17,13 +17,15 @@ export * from "./components/ui/label";
 export * from "./components/ui/popover";
 export * from "./components/ui/segmented";
 export * from "./components/ui/select";
-export * from "./components/ui/series-explorer";
 export * from "./components/ui/table";
 export * from "./components/ui/tooltip";
 
 export { default as XfinaHeader } from "./components/xfina/XfinaHeader.vue";
 export { default as XfinaFamily } from "./components/xfina/XfinaFamily.vue";
 export { default as XfinaProvider } from "./components/xfina/XfinaProvider.vue";
+
+// SeriesExplorer is not here: it is `xfina-ui/series-explorer`, so that a site
+// which does not use it never has to resolve ECharts. See src/series-explorer.js.
 
 export { FAMILY, SITES, USED_BY, siteFor } from "./family.js";
 export { useXfinaTheme } from "./theme.js";

@@ -6,7 +6,7 @@
 import { expect, test } from "vitest";
 import { createSSRApp, h } from "vue";
 import { renderToString } from "vue/server-renderer";
-import { SeriesExplorer } from "@/index.js";
+import { SeriesExplorer } from "@/series-explorer.js";
 
 test("SeriesExplorer renders its controls on the server, from the bounds it is given", async () => {
   expect(typeof window).toBe("undefined");
